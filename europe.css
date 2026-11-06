@@ -300,6 +300,11 @@
 .edv .edv-axes span { display: inline-flex; align-items: center; gap: 0.45rem; }
 .edv .edv-dot--soft { fill-opacity: 0.6; stroke-width: 0.75px; }
 .edv .edv-dot--soft.edv-dot--aside { fill-opacity: 1; }
+.edv .edv-dot--bubble { fill-opacity: 0.45; stroke-width: 0.9px; }
+.edv .edv-dot--bubble.edv-dot--blue { stroke: var(--blue); }
+.edv .edv-dot--bubble.edv-dot--red { stroke: var(--red); }
+.edv .edv-dot--bubble.edv-dot--aside { fill: var(--paper); fill-opacity: 1; stroke-width: 1.5px; }
+.edv .edv-sizekey { vertical-align: middle; margin-right: 0.4rem; overflow: visible; }
 .edv .edv-ctry { fill: var(--paper); fill-opacity: 0.85; stroke: var(--ink); stroke-width: 1.75px; }
 .edv .edv-ctry-label { font-family: var(--font-support); font-size: 10px; fill: var(--ink); pointer-events: none; }
 .edv .edv-sw--soft { border-radius: 50%; opacity: 0.6; width: 10px; height: 10px; }
