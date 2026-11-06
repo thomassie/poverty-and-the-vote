@@ -632,7 +632,9 @@
 
       renderHero();
       const eu = regions.filter((r) => r.eu);
-      $('#map-intro').textContent = 'The ' + eu.length + ' regions of the 27 member states (NUTS 2), with Switzerland for poverty risk. ' +
+      $('#map-intro').textContent = 'The ' + eu.length + ' regions of the 27 member states, with Switzerland for poverty risk. ' +
+        'Regions are the EU’s statistical regions (NUTS 2): in Germany the Regierungsbezirke, or the whole Land where there are none; ' +
+        'in Italy the regioni; in France the former régions. ' +
         'Switch between poverty risk, turnout and the far right’s share of the vote in June 2024.';
       if (sum) {
         $('#eu').innerHTML = 'Across the EU: turnout <strong>' + pct(sum.eu_turnout_2024) + '</strong> in 2024 (' + pct(sum.eu_turnout_2019) +
