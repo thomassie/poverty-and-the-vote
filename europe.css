@@ -1,0 +1,314 @@
+/* Europe's Divides, Poverty and the Vote: styles, all scoped under .edv so they cannot touch the
+   host page. The base (layout, type, switches, tooltip, table, footer) is the same as People vs
+   Parliament's pvp.css; colours come from the host's tokens (--paper, --ink, --muted, --rule, --red,
+   --blue, --link), so the page follows the host's light and dark themes; theme.css defines them for
+   the standalone page. Layout reacts to the width of its own container, not the screen.
+   One meaning per colour on this page: ink = poverty risk, blue = turnout, red = far right. */
+.edv { container: edv / inline-size; position: relative; color: var(--ink); }
+/* Embedded (default): the host page provides width and side gutters. */
+.edv:not(.edv--standalone) .wrap { max-width: none; margin-inline: 0; padding-left: 0; padding-right: 0; }
+.edv:not(.edv--standalone) .masthead { padding-top: 0; }
+/* Shield from the host's global element styles (zero-specificity :where, so every rule below still wins). */
+.edv :where(h1, h2, h3, h4, p, ul, ol, li, dl, dt, dd, figure, blockquote, table, th, td, summary, label, select, button, span, b, em, small) {
+  color: inherit; font-family: inherit; letter-spacing: normal; text-transform: none; text-shadow: none; }
+.edv :where(a) { color: var(--link); text-decoration: underline; text-decoration-style: solid; }
+
+/* Layout: soft Bauhaus. An asymmetric two-column grid: a narrow rail carries each section's
+   heading and explanation, a wide field carries the chart. One column under 760px.
+   Colours come only from theme.css tokens. Type follows the main website: Helvetica/Arial for
+   headings, reading text and italic quotations; Google Sans Code for navigation and supporting
+   information (labels, axes, notes, figures in tables). */
+.edv {
+  --font-display: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-support: "Google Sans Code", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --on-yellow: #2D3238;          /* text on the yellow fill, same in both themes */
+  --radius: 14px;
+  --gap: clamp(1.5rem, 4vw, 3rem);
+  --step--1: 0.8125rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.3125rem;
+  --step-2: clamp(1.5rem, 3vw, 1.875rem);
+  --step-3: clamp(2.5rem, 7vw, 4.5rem);
+  --hero: clamp(4rem, 14vw, 8.5rem);
+  --max: 1160px;
+}
+.edv *, .edv *::before, .edv *::after { box-sizing: border-box; }
+.edv [hidden] { display: none !important; }
+.edv {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.edv .wrap {
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.edv h1, .edv h2, .edv h3 { font-family: var(--font-display); font-weight: 500; line-height: 1.1; margin: 0; text-wrap: balance; }
+.edv p { margin: 0; }
+.edv a { text-underline-offset: 0.18em; }
+.edv em, .edv q, .edv blockquote { font-family: var(--font-body); font-style: italic; }
+.edv blockquote { margin: 0; padding-left: 1.25rem; border-left: 3px solid var(--yellow); font-size: var(--step-1); line-height: 1.45; }
+.edv .eyebrow {
+  font-family: var(--font-support);
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+/* Title full stop: a drawn circle (Helvetica's full stop is square). Sits on the baseline. */
+/* An inline graphic, not an empty box: every engine puts its bottom edge on the text baseline. */
+.edv .title-dot { display: inline-block; width: 0.15em; height: 0.15em; margin: 0 0 0 0.06em; padding: 0; vertical-align: baseline; overflow: visible; }
+.edv .title-dot circle { fill: var(--red); }
+/* ---------- Masthead ---------- */
+.edv .masthead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--gap);
+  align-items: end;
+  padding-block: clamp(2.5rem, 7vw, 5rem) 0;
+}
+.edv .masthead__text { display: grid; gap: 1.25rem; max-width: 46rem; min-width: 0; }
+.edv .masthead h1 { font-size: var(--step-3); letter-spacing: -0.02em; }
+.edv .lede { font-size: var(--step-1); line-height: 1.45; max-width: 38rem; }
+/* Bauhaus mark: people (circle), parliament (square), the vote (half circle). */
+.edv .mark { position: relative; width: 168px; height: 168px; flex: none; }
+.edv .mark span { position: absolute; display: block; }
+.edv .mark__square { left: 0; bottom: 0; width: 104px; height: 104px; background: var(--blue); border-radius: 10px; }
+.edv .mark__circle { right: 0; top: 0; width: 104px; height: 104px; background: var(--red); border-radius: 50%; }
+.edv .mark__half { right: 8px; bottom: 0; width: 72px; height: 36px; background: var(--yellow); border-radius: 72px 72px 0 0; }
+
+/* ---------- Sections ---------- */
+.edv .block {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: var(--gap);
+  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  border-bottom: 1px solid var(--rule);
+}
+.edv .block__rail { display: grid; gap: 0.875rem; align-content: start; min-width: 0; }
+.edv .block__rail h2 { font-size: var(--step-2); }
+.edv .block__rail p { color: var(--muted); max-width: 26rem; }
+.edv .block__body { display: grid; gap: 1.25rem; min-width: 0; align-content: start; }
+.edv .note { font-family: var(--font-support); font-size: var(--step--1); color: var(--muted); }
+/* ---------- Charts ---------- */
+.edv .chart { position: relative; width: 100%; min-width: 0; }
+.edv .chart svg { display: block; overflow: visible; }
+.edv .chart text { font-family: var(--font-support); font-size: 11.5px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.edv .chart .grid line { stroke: var(--rule); stroke-width: 1; shape-rendering: crispEdges; }
+.edv .chart .grid line.mid { stroke: var(--muted); stroke-opacity: 0.55; }
+
+.edv .chart .axis-title { font-family: var(--font-support); font-size: 12px; fill: var(--ink); }
+
+.edv .focus-ring { fill: none; stroke: var(--ink); stroke-width: 2px; pointer-events: none; }
+.edv .overlay { fill: transparent; }
+.edv .overlay:focus { outline: none; }
+.edv .overlay:focus-visible { stroke: var(--link); stroke-width: 2px; }
+.edv .tooltip {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  width: max-content;
+  max-width: min(18rem, calc(100% - 8px));
+  padding: 0.75rem 0.875rem;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.12);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+.edv .tooltip[hidden] { display: none; }
+.edv .tt__meta { font-family: var(--font-support); font-size: 0.75rem; color: var(--muted); }
+.edv .tt__title { font-weight: 500; margin: 0.2rem 0 0.5rem; }
+.edv .tt__rows { display: grid; gap: 0.2rem; margin: 0; }
+.edv .tt__rows div { display: flex; justify-content: space-between; gap: 1rem; }
+.edv .tt__rows dt { font-family: var(--font-support); font-size: 0.8125rem; display: flex; align-items: center; gap: 0.45rem; color: var(--muted); }
+.edv .tt__rows dd { margin: 0; font-family: var(--font-support); font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
+
+/* ---------- Filters & legend ---------- */
+.edv .filters { display: grid; gap: 0.5rem; }
+/* Switches ("bar index"): plain labels on a thin rule, a thick ink bar under the selected one.
+   Ink and paper only, so they never borrow the charts' colours or shapes. The rule runs the full
+   width of the column: a background repeating every 44px (the buttons' fixed height), so each
+   wrapped row on a phone gets its own full-width rule too. The bars are inset shadows, so nothing
+   shifts when the selection moves (Google Sans Code keeps its width at weight 500). */
+.edv .seg {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  background: repeating-linear-gradient(to bottom, transparent 0 43px, var(--rule) 43px 44px);
+}
+.edv .seg button {
+  font: inherit;
+  font-family: var(--font-support);
+  font-size: 0.875rem;
+  line-height: 1.2;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 0.875rem;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.edv .seg button:hover { color: var(--ink); box-shadow: inset 0 -4px 0 var(--rule); }
+.edv .seg button[aria-pressed="true"] { color: var(--ink); font-weight: 500; box-shadow: inset 0 -4px 0 var(--ink); }
+.edv .seg button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+@media (forced-colors: active) {
+  .edv .seg { background: none; }
+  .edv .seg button { border-bottom: 1px solid CanvasText; box-shadow: none; }
+  .edv .seg button[aria-pressed="true"] { border-bottom-width: 4px; }
+}
+.edv .legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; font-family: var(--font-support); font-size: 0.875rem; }
+.edv .legend span { display: inline-flex; align-items: center; gap: 0.5rem; }
+.edv .legend .count { font-family: var(--font-support); font-size: 0.8125rem; color: var(--muted); }
+.edv .summary { font-family: var(--font-support); font-size: 0.875rem; color: var(--muted); }
+.edv .summary strong { color: var(--ink); font-weight: 500; }
+/* ---------- Table view ---------- */
+.edv .tableview summary { font-family: var(--font-support); font-size: 0.9375rem; cursor: pointer; color: var(--link); width: max-content; max-width: 100%; }
+.edv .tableview summary:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; border-radius: 4px; }
+.edv .tablewrap { overflow-x: auto; max-height: 28rem; overflow-y: auto; margin-top: 0.75rem; border: 1px solid var(--rule); border-radius: 10px; }
+.edv table { border-collapse: collapse; width: 100%; font-size: 0.875rem; }
+.edv th, .edv td { text-align: left; padding: 0.45rem 0.75rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.edv th { position: sticky; top: 0; background: var(--paper); font-family: var(--font-support); font-size: 0.8125rem; font-weight: 500; white-space: nowrap; }
+.edv td.num, .edv th.num { text-align: right; font-family: var(--font-support); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.edv td.date { font-family: var(--font-support); white-space: nowrap; }
+
+/* ---------- Footer ---------- */
+.edv .foot { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: var(--gap); padding-block: clamp(2.5rem, 6vw, 4rem); }
+.edv .foot h2 { font-size: var(--step-1); }
+.edv .foot ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.5rem; color: var(--muted); max-width: 44rem; }
+.edv .foot .credit { font-family: var(--font-support); margin-top: 1.25rem; font-size: var(--step--1); color: var(--muted); }
+.edv .error { padding: 1rem 1.25rem; border-radius: var(--radius); border: 1px solid var(--red); }
+
+/* ---------- This page ---------- */
+.edv .edv-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+.edv .edv-hatch-bg { fill: var(--paper); }
+.edv .edv-hatch-line { stroke: var(--muted); stroke-width: 1.2px; stroke-opacity: 0.6; }
+/* Mark: poverty (square, ink), turnout (circle, blue), far right (half circle, red) */
+.edv .mark__square { background: var(--ink); }
+.edv .mark__circle { background: var(--blue); }
+.edv .mark__half { background: var(--red); }
+/* Hero: two figures side by side */
+.edv .hero {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem clamp(1.5rem, 4vw, 3rem);
+  align-items: start;
+  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  border-bottom: 1px solid var(--rule);
+}
+.edv .hero__item { display: grid; gap: 0.6rem; align-content: start; min-width: 0; }
+.edv .hero__label { font-family: var(--font-support); font-size: 0.875rem; color: var(--muted); display: inline-flex; align-items: center; gap: 0.5rem; }
+.edv .hero__figure { font-family: var(--font-body); font-weight: 500; font-size: clamp(3.25rem, 10vw, 6.5rem); line-height: 0.9; letter-spacing: -0.03em; }
+.edv .hero__figure small { font-size: 0.45em; letter-spacing: 0; margin-left: 0.04em; }
+.edv .hero__text { font-size: var(--step-1); line-height: 1.45; max-width: 28rem; }
+/* swatches */
+.edv .edv-sw { display: inline-block; width: 12px; height: 12px; flex: none; border-radius: 2px; }
+.edv .edv-sw--blue { background: var(--blue); border-radius: 50%; }
+.edv .edv-sw--red { background: var(--red); border-radius: 50%; }
+.edv .edv-sw--none { background: repeating-linear-gradient(45deg, var(--paper) 0 2.5px, color-mix(in srgb, var(--muted) 60%, var(--paper)) 2.5px 3.7px); box-shadow: inset 0 0 0 1px var(--rule); }
+.edv .edv-sw--out { background: var(--paper); box-shadow: inset 0 0 0 1px var(--muted); }
+/* find a region */
+.edv .edv-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
+.edv .edv-find { font-family: var(--font-support); font-size: 0.875rem; color: var(--muted); }
+.edv .edv-tools input {
+  font: inherit; font-family: var(--font-support); font-size: 0.9375rem; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--muted); border-radius: 999px;
+  padding: 0.4rem 0.95rem; width: min(18rem, 100%); min-width: 0; }
+.edv .edv-tools input::placeholder { color: var(--muted); opacity: 1; }
+.edv .edv-tools input:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+/* map */
+.edv .edv-legend { display: grid; gap: 0.2rem; }
+.edv .edv-legend__title { font-family: var(--font-support); font-size: 0.8125rem; color: var(--ink); }
+.edv .edv-legend svg { display: block; overflow: visible; }
+.edv .edv-legend text { font-family: var(--font-support); font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.edv .edv-key { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; font-family: var(--font-support); font-size: 0.8125rem; color: var(--muted); }
+.edv .edv-key span { display: inline-flex; align-items: center; gap: 0.45rem; }
+.edv .edv-c--ink { fill: var(--ink); }
+.edv .edv-c--blue { fill: var(--blue); }
+.edv .edv-c--red { fill: var(--red); }
+.edv .edv-rg { stroke: var(--paper); stroke-width: 0.45px; stroke-linejoin: round; }
+.edv .edv-mapsvg--small .edv-rg { stroke-width: 0.3px; }
+.edv .edv-rg--out { fill: var(--paper); stroke: var(--muted); stroke-opacity: 0.45; }
+.edv .edv-rg--none { fill: url(#edv-hatch); }
+.edv .edv-border { fill: none; stroke: var(--ink); stroke-width: 0.8px; stroke-opacity: 0.55; stroke-linejoin: round; pointer-events: none; }
+.edv .edv-mapsvg--small .edv-border { stroke-width: 0.6px; }
+.edv .edv-hl { fill: none; stroke: var(--ink); stroke-width: 2px; stroke-linejoin: round; pointer-events: none; }
+.edv .edv-inset path { stroke-width: 1px; stroke-linejoin: round; }
+.edv .edv-inset path.edv-c--ink { stroke: var(--ink); }
+.edv .edv-inset path.edv-c--blue { stroke: var(--blue); }
+.edv .edv-inset path.edv-c--red { stroke: var(--red); }
+.edv .edv-inset path.edv-rg--none { stroke: var(--muted); }
+.edv .edv-inset path.edv-hl-in { stroke: var(--ink); stroke-width: 2px; stroke-opacity: 1; }
+.edv .edv-map { touch-action: manipulation; }
+.edv .edv-map svg path.edv-rg { cursor: default; }
+.edv .edv-insets { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; margin-top: 0.75rem; }
+.edv .edv-inset { margin: 0; display: grid; gap: 0.2rem; justify-items: center; }
+.edv .edv-inset svg { border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.edv .edv-inset figcaption { font-family: var(--font-support); font-size: 0.6875rem; color: var(--muted); max-width: 5.5rem; text-align: center; line-height: 1.25; }
+/* tooltip table: region next to its country */
+.edv .tooltip { max-width: min(20rem, calc(100% - 8px)); }
+.edv .tt__tab { border-collapse: collapse; width: 100%; font-family: var(--font-support); font-size: 0.8125rem; }
+.edv .tt__tab th, .edv .tt__tab td { padding: 0.12rem 0 0.12rem 0.9rem; border: 0; text-align: right; font-weight: 400; position: static; background: none; white-space: nowrap; }
+.edv .tt__tab th:first-child { padding-left: 0; text-align: left; color: var(--muted); white-space: normal; }
+.edv .tt__tab thead th { font-size: 0.75rem; color: var(--muted); padding-bottom: 0.25rem; max-width: 7rem; overflow: hidden; text-overflow: ellipsis; }
+.edv .tt__tab td { font-variant-numeric: tabular-nums; }
+.edv .tt__tab td + td { color: var(--muted); }
+.edv .tt__tab .tt__sub th, .edv .tt__tab .tt__sub td { font-size: 0.75rem; color: var(--muted); }
+.edv .tt__note { margin-top: 0.45rem; font-family: var(--font-support); font-size: 0.75rem; color: var(--muted); }
+/* small multiples */
+.edv .edv-axes { display: flex; flex-wrap: wrap; gap: 0.2rem 1.5rem; font-family: var(--font-support); font-size: 0.8125rem; color: var(--ink); }
+.edv .edv-panels { display: grid; row-gap: 1.5rem; }
+.edv .edv-panel { min-width: 0; display: grid; gap: 0.1rem; align-content: start; }
+.edv .edv-panel__name { font-weight: 500; font-size: 0.9375rem; line-height: 1.25; }
+.edv .edv-panel__say { font-family: var(--font-support); font-size: 0.75rem; color: var(--muted); line-height: 1.3; min-height: 2.6em; }
+.edv .edv-panel__say.is-dir { color: var(--ink); }
+.edv .edv-panel__say span { white-space: nowrap; color: var(--muted); }
+.edv .edv-panel svg { margin-top: 0.3rem; }
+.edv .chart text.tick { font-size: 10px; }
+.edv .edv-dot { stroke: var(--paper); stroke-width: 1px; }
+.edv .edv-dot--blue { fill: var(--blue); }
+.edv .edv-dot--red { fill: var(--red); }
+.edv .edv-trend { stroke: var(--ink); stroke-width: 2px; stroke-linecap: round; pointer-events: none; }
+/* far-right lists */
+.edv .edv-lists { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr)); gap: 1.75rem 1.5rem; }
+.edv .edv-list { display: grid; gap: 0.3rem; align-content: start; min-width: 0; }
+.edv .edv-list h3 { font-size: var(--step-0); font-weight: 500; }
+.edv .edv-list__tot { font-family: var(--font-support); font-size: 0.8125rem; color: var(--muted); }
+.edv .edv-list__tot b { color: var(--ink); font-weight: 500; }
+.edv .edv-list table { font-size: 0.8125rem; }
+.edv .edv-list th, .edv .edv-list td { padding: 0.3rem 0 0.3rem 0.6rem; }
+.edv .edv-list th:first-child, .edv .edv-list td:first-child { padding-left: 0; }
+.edv .edv-list th { position: static; font-size: 0.75rem; color: var(--muted); font-weight: 400; }
+.edv .edv-list th.num, .edv .edv-list td.num { width: 3.25rem; }
+.edv .edv-list__party { font-weight: 500; }
+.edv .edv-list__en { color: var(--muted); }
+.edv .edv-list__meta { display: block; font-family: var(--font-support); font-size: 0.6875rem; color: var(--muted); }
+.edv .edv-list__none { font-family: var(--font-support); font-size: 0.8125rem; color: var(--muted); }
+.edv .edv-list td, .edv .tt__title, .edv .edv-panel__name { overflow-wrap: anywhere; }
+@container edv (max-width: 760px) {
+  .edv .masthead { grid-template-columns: minmax(0, 1fr); }
+  .edv .mark { width: 96px; height: 96px; order: -1; }
+  .edv .mark__square { width: 60px; height: 60px; border-radius: 7px; }
+  .edv .mark__circle { width: 60px; height: 60px; }
+  .edv .mark__half { width: 42px; height: 21px; right: 4px; }
+  .edv .block, .edv .foot { grid-template-columns: minmax(0, 1fr); }
+  .edv .seg button { padding: 0 0.6rem; }
+}
+@container edv (max-width: 520px) {
+  .edv .hero { grid-template-columns: minmax(0, 1fr); }
+}
+/* the wide region table scrolls inside its frame instead of widening the column */
+.edv .block__body > * { min-width: 0; }
