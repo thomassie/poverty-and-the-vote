@@ -53,6 +53,7 @@
     </div>
     <div class="block__body">
       <div class="seg" role="group" aria-label="Measure shown on the map" id="edv-measure"></div>
+      <div class="seg" role="group" aria-label="Map level" id="edv-level"></div>
       <div class="edv-tools">
         <label class="edv-find" for="edv-find">Find a region</label>
         <input type="search" id="edv-find" list="edv-find-list" placeholder="e.g. Sicilia" autocomplete="off" spellcheck="false">
@@ -60,7 +61,7 @@
       </div>
       <div class="edv-legend" id="edv-legend"></div>
       <div class="chart edv-map" id="edv-map"><p class="note">Loading the map&hellip;</p></div>
-      <p class="note" id="edv-map-status" aria-live="polite">Hover or tap a region for details; tap again to let go.</p>
+      <p class="note" id="edv-map-status" aria-live="polite">Hover or tap the map for details; tap again to let go.</p>
       <p class="summary" id="edv-eu"></p>
       <details class="tableview" id="edv-table">
         <summary>Show all regions as a table</summary>
@@ -74,11 +75,25 @@
     </div>
   </section>
 
+  <section class="block wrap" aria-labelledby="edv-h-all">
+    <div class="block__rail">
+      <h2 id="edv-h-all">All regions together</h2>
+      <p>Every region of the EU in one picture, with each country as a whole. Here the differences between countries dominate: turnout habits, electoral rules and party landscapes vary more from country to country than poverty does.</p>
+      <p>Each dot is a region, each square a country. The line is the overall trend across all regions (least squares). The next section compares regions within each country instead.</p>
+    </div>
+    <div class="block__body">
+      <div class="seg" role="group" aria-label="Vote measure" id="edv-ameasure"></div>
+      <p class="edv-axes" id="edv-all-axes"></p>
+      <div class="chart edv-all" id="edv-all"></div>
+      <p class="note" id="edv-all-note"></p>
+    </div>
+  </section>
+
   <section class="block wrap" aria-labelledby="edv-h-countries">
     <div class="block__rail">
       <h2 id="edv-h-countries">Country by country</h2>
       <p>Turnout and the far right&rsquo;s strength differ far more between countries than inside them: compulsory voting, national elections held the same day, each country&rsquo;s own parties. So each region is compared with the other regions of its own country.</p>
-      <p>France&rsquo;s overseas regions, in the Caribbean, South America and the Indian Ocean, are shown as hollow dots but not counted: far from Europe, they differ from mainland France in too many other ways.</p>
+      <p>Hollow dots are shown but not counted. France&rsquo;s overseas regions, in the Caribbean, South America and the Indian Ocean, differ from mainland France in too many other ways. In Belgium the lists counted as far right stand only in the Dutch-speaking electoral college, so for the far right only the five Flemish provinces are compared.</p>
       <p>Each dot is a region. The line follows the trend. &rho; (rho) ranks the regions by poverty risk and by the vote and measures how well the two rankings agree, from &minus;1 to +1; from &plusmn;0.2 we call it a difference.</p>
     </div>
     <div class="block__body">
@@ -111,7 +126,8 @@
       <li>Ireland counts European votes by constituency, which do not match its regions, so it has national figures only. Malta, Cyprus, Estonia, Latvia and Luxembourg are one region each.</li>
       <li>Far right: lists whose party the PopuList&nbsp;4.0 marks as far right in the year of the election, as a share of valid votes. Joint lists count by their first-named party. Parties are matched through Party Facts numbers, and by hand where the numbers are missing or differ; every hand match is listed in the project&rsquo;s data notes.</li>
       <li>Poverty risk (at risk of poverty or social exclusion) is a Eurostat survey estimate for 2024, or the nearest year; for small regions its margin of error is several points. Its income line is 60% of each country&rsquo;s median, so it is best compared within a country.</li>
-      <li>Within each country, &rho; is the rank correlation (Spearman) over its regions, each region counted once whatever its size. The line is the median of the slopes between every pair of regions, so one unusual region cannot tip it. Only countries with at least three regions are counted in the figures at the top. France&rsquo;s overseas regions (Guadeloupe, Martinique, Guyane, La R&eacute;union, Mayotte) are left out of these comparisons; the Canary Islands, the Azores, Madeira, Ceuta and Melilla are counted with Spain and Portugal.</li>
+      <li>Within each country, &rho; is the rank correlation (Spearman) over its regions, each region counted once whatever its size. The line is the median of the slopes between every pair of regions, so one unusual region cannot tip it. Only countries with at least three regions are counted in the figures at the top. France&rsquo;s overseas regions (Guadeloupe, Martinique, Guyane, La R&eacute;union, Mayotte) are left out of these comparisons; the Canary Islands, the Azores, Madeira, Ceuta and Melilla are counted with Spain and Portugal. Belgium elects its members in separate electoral colleges by language, and the lists counted as far right (Vlaams Belang, N-VA) stand only in the Dutch-speaking one; for the far right, only its five Flemish provinces are compared, not Wallonia and Brussels.</li>
+      <li>The overall trend in &ldquo;All regions together&rdquo; is a least-squares line over all EU regions with a figure, each counted once; for turnout, Belgium and Luxembourg (compulsory voting) are left out of the line.</li>
       <li>This shows how voting and poverty go together, not that one causes the other: poorer regions also differ in age, in how rural they are, in language and in their regional parties.</li>
       <li>Switzerland is not in the EU and has no European election; its regions show poverty risk only. Swiss votes: <a href="${SWISS_PAGE}">People vs Parliament</a>.</li>
     </ul>
@@ -130,10 +146,10 @@
   };
   // small multiples: the vote measure against poverty risk; dir = the direction the question asks about
   const PMEASURES = {
-    t: { key: 't24', short: 'Turnout', cls: 'blue', ymax: 90, ticks: [0, 30, 60, 90], dir: -1,
+    t: { key: 't24', ckey: 'ct', noun: 'turnout', short: 'Turnout', cls: 'blue', ymax: 90, ticks: [0, 30, 60, 90], dir: -1,
       axis: 'up: turnout 2024, % of registered voters',
       say: { '-1': 'Poorer regions voted less', 1: 'Poorer regions voted more', 0: 'Little difference' } },
-    f: { key: 'f24', short: 'Far right', cls: 'red', ymax: 75, ticks: [0, 25, 50, 75], dir: 1,
+    f: { key: 'f24', ckey: 'cf', noun: 'far-right share', short: 'Far right', cls: 'red', ymax: 75, ticks: [0, 25, 50, 75], dir: 1,
       axis: 'up: far right 2024, % of valid votes',
       say: { 1: 'Poorer regions: more far right', '-1': 'Poorer regions: less far right', 0: 'Little difference' } },
   };
@@ -142,10 +158,16 @@
   // outermost regions: drawn as insets under the map, so the map can stay on Europe
   const OUTER = ['PT20', 'PT30', 'ES70', 'FRY1', 'FRY2', 'FRY3', 'FRY4', 'FRY5'];
   const DROP = new Set(['NO0B']);   // Svalbard and Jan Mayen
-  // France's overseas regions (Caribbean, South America, Indian Ocean): on the map and in the table, but
-  // not counted when regions are compared within France; far from Europe, they differ from the mainland
-  // in too many other ways. Spain's and Portugal's islands, Ceuta and Melilla stay in (decision 6 Nov 2026).
-  const ASIDE = new Set(['FRY1', 'FRY2', 'FRY3', 'FRY4', 'FRY5']);
+  // Shown but not counted when regions are compared within their country (decisions of 6 Nov 2026):
+  // France's overseas regions (Caribbean, South America, Indian Ocean), far from Europe and different from
+  // the mainland in too many other ways; Spain's and Portugal's islands, Ceuta and Melilla stay in.
+  // For the far right in Belgium, Wallonia and Brussels: the lists counted as far right (VB, N-VA) stand
+  // only in the Dutch-speaking electoral college, so only the Flemish provinces (BE2x) are compared.
+  const OVERSEAS = new Set(['FRY1', 'FRY2', 'FRY3', 'FRY4', 'FRY5']);
+  const asideOf = (r, key) => (OVERSEAS.has(r.id) ? 'overseas'
+    : key === 'f24' && r.cc === 'BE' && !r.id.startsWith('BE2') ? 'college' : null);
+  const ASIDE_KEY = { overseas: 'France&rsquo;s overseas regions', college: 'Wallonia and Brussels (far right)' };
+  const SHOW_CODE = { EL: 'GR' };   // Eurostat writes Greece EL
   // map extent in ETRS89 / LAEA Europe (EPSG:3035) metres: Iceland and Portugal to Cyprus, Crete to Lapland
   const EXTENT = { type: 'Polygon', coordinates: [[[2560000, 1380000], [6560000, 1380000], [6560000, 5340000], [2560000, 5340000], [2560000, 1380000]]] };
   const OTHER = { NO: 'Norway', IS: 'Iceland', LI: 'Liechtenstein', AL: 'Albania', BA: 'Bosnia and Herzegovina', ME: 'Montenegro',
@@ -167,13 +189,16 @@
   const signed = (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + d3.format('.2f')(Math.abs(v));
   const WORDS = ['none', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
   const words = (n) => WORDS[n] || String(n);
-  const state = { measure: 'p', pm: 't', focus: null, pinned: null };
+  const state = { measure: 'p', level: 'r', pm: 't', am: 't', focus: null, pinned: null };
+  const STORE = { measure: 'edv-measure', level: 'edv-level', pm: 'edv-pmeasure', am: 'edv-ameasure' };
   try {
-    const m = localStorage.getItem('edv-measure'); if (MEASURES[m]) state.measure = m;
-    const p = localStorage.getItem('edv-pmeasure'); if (PMEASURES[p]) state.pm = p;
+    const m = localStorage.getItem(STORE.measure); if (MEASURES[m]) state.measure = m;
+    const l = localStorage.getItem(STORE.level); if (l === 'r' || l === 'c') state.level = l;
+    const p = localStorage.getItem(STORE.pm); if (PMEASURES[p]) state.pm = p;
+    const a = localStorage.getItem(STORE.am); if (PMEASURES[a]) state.am = a;
   } catch (e) { /* storage unavailable */ }
 
-  let REGIONS = [], BY_ID = new Map(), COUNT = new Map(), MAP = null, MAPV = null;
+  let REGIONS = [], BY_ID = new Map(), COUNT = new Map(), CTRY = new Map(), MAP = null, MAPV = null, ALLV = null;
   const PANELS = new Map();
 
   // ---------- helpers ----------
@@ -256,7 +281,7 @@
         if (state[key] === val) return;
         state[key] = val;
         el.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-        try { localStorage.setItem(key === 'measure' ? 'edv-measure' : 'edv-pmeasure', val); } catch (e) { /* storage unavailable */ }
+        try { localStorage.setItem(STORE[key], val); } catch (e) { /* storage unavailable */ }
         onPick();
       });
       el.appendChild(b);
@@ -296,9 +321,9 @@
   function countryStats(key) {
     return d3.groups(REGIONS.filter((r) => r.eu), (r) => r.cc).map(([cc, rows]) => {
       const all = rows.filter((r) => r.p != null && r[key] != null);
-      const pts = all.filter((r) => !ASIDE.has(r.id)), aside = all.filter((r) => ASIDE.has(r.id));
+      const pts = all.filter((r) => !asideOf(r, key)), aside = all.filter((r) => asideOf(r, key));
       const rho = spearman(pts.map((r) => r.p), pts.map((r) => r[key]));
-      return { cc, name: rows[0].country, regions: rows.filter((r) => !ASIDE.has(r.id)).length, compulsory: rows[0].compulsory,
+      return { cc, name: rows[0].country, regions: rows.filter((r) => !asideOf(r, key)).length, compulsory: rows[0].compulsory,
         pts, aside, rho, v: verdict(rho),
         line: pts.length >= 3 ? theilSen(pts.map((r) => r.p), pts.map((r) => r[key])) : null };
     });
@@ -342,17 +367,21 @@
     el.setAttribute('aria-label', M.title + ': steps ' + M.bins.join(', ') + '.');
   }
 
-  function shade(sel) {
+  // a region (level 'r') or a whole country (level 'c', its national figures)
+  function valueOf(f, M, level) {
+    const d = level === 'c' ? CTRY.get(f.properties.id) : BY_ID.get(f.properties.id);
+    return d ? { d, v: d[level === 'c' ? M.ckey : M.key] } : null;
+  }
+  function shade(sel, level) {
     const M = MEASURES[state.measure];
     sel.attr('class', (f) => {
-      const r = BY_ID.get(f.properties.id);
-      if (!r) return 'edv-rg edv-rg--out';
-      const v = r[M.key];
-      if (v == null) return r.eu || M.key === 'p' ? 'edv-rg edv-rg--none' : 'edv-rg edv-rg--out';
+      const o = valueOf(f, M, level);
+      if (!o) return 'edv-rg edv-rg--out';
+      if (o.v == null) return o.d.eu || M.key === 'p' ? 'edv-rg edv-rg--none' : 'edv-rg edv-rg--out';
       return 'edv-rg edv-c--' + M.cls;
     }).attr('fill-opacity', (f) => {
-      const r = BY_ID.get(f.properties.id), v = r ? r[M.key] : null;
-      return v == null ? null : opOf(binOf(v, M), M);
+      const o = valueOf(f, M, level);
+      return o && o.v != null ? opOf(binOf(o.v, M), M) : null;
     });
   }
 
@@ -380,14 +409,37 @@
     if (r.b) notes.push(d3.format(',')(r.b) + ' ballots cast in 2024.');
     if (r.pflag && FLAG[r.pflag]) notes.push('Poverty risk: ' + FLAG[r.pflag] + '.');
     if (r.p == null) notes.push('No poverty figure for this region.');
-    if (ASIDE.has(r.id)) notes.push('Overseas region: not counted when the regions of ' + r.country + ' are compared.');
+    if (asideOf(r, 't24') === 'overseas') notes.push('Overseas region: not counted when the regions of ' + r.country + ' are compared.');
+    if (asideOf(r, 'f24') === 'college') notes.push('Not counted when Belgium’s regions are compared for the far right: the lists counted as far right stand only in the Dutch-speaking electoral college.');
     [r.id, r.cc].forEach((k) => { if (NOTE[k]) notes.push(NOTE[k]); });
     if (notes.length) html += '<p class="tt__note">' + notes.map(esc).join(' ') + '</p>';
     return html;
   }
+  function countryTip(cc) {
+    const c = CTRY.get(cc);
+    if (!c) {
+      return '<p class="tt__meta">Not in the EU</p><p class="tt__title">' + esc(OTHER[cc] || cc) +
+        '</p><p class="tt__note">No European election, no figures here.</p>';
+    }
+    let html = '<p class="tt__meta">' + (c.eu ? 'Country · ' + c.n + (c.n === 1 ? ' region' : ' regions') : 'Not in the EU') + '</p>' +
+      '<p class="tt__title">' + esc(c.name) + '</p><table class="tt__tab"><tbody>' +
+      '<tr><th>Poverty risk</th><td>' + pct(c.cp) + '</td></tr>';
+    if (c.eu) html += '<tr><th>Turnout 2024</th><td>' + pct(c.ct) + '</td></tr><tr><th>Far right 2024</th><td>' + pct(c.cf) + '</td></tr>';
+    html += '</tbody></table>';
+    const notes = [];
+    if (c.compulsory) notes.push('Voting is compulsory in ' + c.name + '.');
+    if (!c.eu) notes.push(NOTE.CH);
+    if (c.eu && c.cp == null) notes.push('No national poverty figure for the survey year.');
+    if (c.eu && c.ct == null) notes.push('National results not available here yet.');
+    if (notes.length) html += '<p class="tt__note">' + notes.map(esc).join(' ') + '</p>';
+    return html;
+  }
   function statusText(id) {
-    const r = BY_ID.get(id);
-    if (!r) return 'Hover or tap a region for details; tap again to let go.';
+    const r = BY_ID.get(id), c = CTRY.get(id);
+    if (!r && c) {
+      return c.name + ': poverty risk ' + pct(c.cp) + (c.eu ? ', turnout ' + pct(c.ct) + ', far right ' + pct(c.cf) + ' in 2024.' : '.');
+    }
+    if (!r) return 'Hover or tap the map for details; tap again to let go.';
     return r.name + ' (' + r.country + '): poverty risk ' + pct(r.p) +
       (r.eu ? ', turnout ' + pct(r.t24) + ', far right ' + pct(r.f24) + ' in 2024.' : '.');
   }
@@ -410,30 +462,30 @@
     const proj = d3.geoIdentity().reflectY(true).fitWidth(W, EXTENT);
     const path = d3.geoPath(proj);
     const H = Math.round(path.bounds(EXTENT)[1][1]);
-    const M = MEASURES[state.measure];
+    const M = MEASURES[state.measure], level = state.level;
     const svg = d3.select(el).insert('svg', ':first-child')
       .attr('width', W).attr('height', H).attr('viewBox', '0 0 ' + W + ' ' + H)
       .attr('class', W < 600 ? 'edv-mapsvg edv-mapsvg--small' : 'edv-mapsvg')
       .attr('role', 'img')
-      .attr('aria-label', 'Map of ' + MAP.dataCount + ' European regions, shaded by ' + M.title.toLowerCase() +
-        '. Darker means more. Use the search box above or the table below to read one region.');
+      .attr('aria-label', (level === 'c' ? 'Map of the EU member states' : 'Map of ' + MAP.dataCount + ' European regions') +
+        ', shaded by ' + M.title.toLowerCase() + '. Darker means more. Use the search box above or the table below to read one region.');
     svg.append('clipPath').attr('id', 'edv-clip').append('rect').attr('width', W).attr('height', H);
     const g = svg.append('g').attr('clip-path', 'url(#edv-clip)');
-    const regs = g.append('g').selectAll('path').data(MAP.main).join('path').attr('d', path);
-    shade(regs);
+    const regs = g.append('g').selectAll('path').data(level === 'c' ? MAP.countryFeats : MAP.main).join('path').attr('d', path);
+    shade(regs, level);
     g.append('path').datum(MAP.countries).attr('class', 'edv-border').attr('d', path);
     const hl = g.append('path').attr('class', 'edv-hl');
 
-    // outermost regions, each fitted into its own small box
+    // outermost regions, each fitted into its own small box (regions only)
     const box = W < 520 ? 54 : 70;
     const ins = d3.select(el).append('div').attr('class', 'edv-insets');
     const insets = new Map();
-    MAP.outer.forEach((f) => {
+    (level === 'r' ? MAP.outer : []).forEach((f) => {
       const fig = ins.append('figure').attr('class', 'edv-inset');
       const p = d3.geoPath(d3.geoIdentity().reflectY(true).fitExtent([[5, 5], [box - 5, box - 5]], mainIslands(f)));
       const s = fig.append('svg').attr('width', box).attr('height', box).attr('viewBox', '0 0 ' + box + ' ' + box).attr('aria-hidden', 'true');
       const rp = s.append('path').datum(f).attr('d', p);
-      shade(rp);
+      shade(rp, 'r');
       rp.attr('stroke-opacity', rp.attr('fill-opacity'));   // a hairline in the fill colour keeps small islands visible
       fig.append('figcaption').text(f.properties.name.replace(/^Região Autónoma dos /, '').replace(/^Região Autónoma da /, ''));
       insets.set(f.properties.id, { fig: fig.node(), path: rp, p });
@@ -441,20 +493,24 @@
 
     MAPV = {
       mark(id, xy) {
-        const f = id != null ? MAP.byId.get(id) : null;
-        const inMain = f && !insets.has(id);
+        // on the country map a region marks its country
+        const key = id == null ? null : level === 'c' && BY_ID.has(id) ? BY_ID.get(id).cc : id;
+        const f = key == null ? null : level === 'c' ? MAP.countryById.get(key) : MAP.byId.get(key);
+        const inMain = f && !insets.has(key);
         hl.attr('d', inMain ? path(f) : null);
-        insets.forEach((v, k) => v.path.classed('edv-hl-in', k === id));
+        insets.forEach((v, k) => v.path.classed('edv-hl-in', k === key));
         if (!f) { tip.hide(); return; }
         let pos = xy;
         if (!pos) {
-          if (inMain) pos = path.centroid(f);
-          else {
-            const v = insets.get(id), a = el.getBoundingClientRect(), b = v.fig.getBoundingClientRect();
+          if (inMain) {
+            pos = path.centroid(level === 'c' && MAP.byId.has(id) ? MAP.byId.get(id) : f);
+            pos = [Math.max(0, Math.min(W, pos[0])), Math.max(0, Math.min(H, pos[1]))];
+          } else {
+            const v = insets.get(key), a = el.getBoundingClientRect(), b = v.fig.getBoundingClientRect();
             pos = [b.left - a.left + box / 2, b.top - a.top + box / 2];
           }
         }
-        tip.show(regionTip(id), pos[0], pos[1]);
+        tip.show(level === 'c' ? countryTip(key) : regionTip(key), pos[0], pos[1]);
       },
     };
     const idOf = (ev) => { const f = d3.select(ev.target).datum(); return f && f.properties ? f.properties.id : null; };
@@ -475,6 +531,7 @@
   function focus(id, xy) {
     state.focus = id;
     if (MAPV) MAPV.mark(id, xy);
+    if (ALLV) ALLV.mark(id);
     PANELS.forEach((p) => p.mark(id));
     $('#map-status').textContent = statusText(id);
   }
@@ -509,6 +566,113 @@
       .join('');
   }
 
+  // ---------- all regions together ----------
+  function ols(xs, ys) {
+    const mx = d3.mean(xs), my = d3.mean(ys);
+    let n = 0, d = 0;
+    xs.forEach((x, i) => { n += (x - mx) * (ys[i] - my); d += (x - mx) ** 2; });
+    const b = d ? n / d : 0;
+    return { b, a: my - b * mx };
+  }
+
+  function drawAll(el) {
+    const W = Math.round(el.clientWidth);
+    if (!W) return;
+    el.querySelectorAll('svg').forEach((n) => n.remove());
+    const tip = el._tip || (el._tip = tooltip(el));
+    tip.hide();
+    const P = PMEASURES[state.am], small = W < 520, turnout = P.key === 't24';
+    const H = Math.round(Math.max(260, Math.min(W * 0.62, 520)));
+    const m = { t: 12, r: 14, b: 30, l: small ? 28 : 34 };
+    const x = d3.scaleLinear().domain([0, X_MAX]).range([m.l, W - m.r]);
+    const y = d3.scaleLinear().domain([0, P.ymax]).range([H - m.b, m.t]);
+    const regs = REGIONS.filter((r) => r.eu && r.p != null && r[P.key] != null);
+    const counted = regs.filter((r) => !(turnout && r.compulsory));
+    const ctry = [...CTRY.values()].filter((c) => c.eu && c.cp != null && c[P.ckey] != null);
+    const ctryCounted = ctry.filter((c) => !(turnout && c.compulsory));
+    const line = ols(counted.map((r) => r.p), counted.map((r) => r[P.key]));
+    const rhoR = spearman(counted.map((r) => r.p), counted.map((r) => r[P.key]));
+    const rhoC = spearman(ctryCounted.map((c) => c.cp), ctryCounted.map((c) => c[P.ckey]));
+    const xTicks = [0, 10, 20, 30, 40, 50, 60];
+
+    const svg = d3.select(el).insert('svg', ':first-child').attr('width', W).attr('height', H).attr('viewBox', '0 0 ' + W + ' ' + H)
+      .attr('role', 'img').attr('aria-label', 'Scatter of ' + regs.length + ' EU regions and ' + ctry.length + ' countries: poverty risk across, ' +
+        P.noun + ' up. Overall trend: ' + (line.b < 0 ? 'down' : 'up') + ', rank correlation ' + signed(rhoR) + ' across regions.');
+    const g = svg.append('g').attr('class', 'grid');
+    g.selectAll('line.h').data(P.ticks).join('line').attr('class', 'h')
+      .attr('x1', m.l).attr('x2', W - m.r).attr('y1', (d) => Math.round(y(d)) + 0.5).attr('y2', (d) => Math.round(y(d)) + 0.5);
+    g.selectAll('line.v').data(xTicks).join('line').attr('class', 'v')
+      .attr('y1', m.t).attr('y2', H - m.b).attr('x1', (d) => Math.round(x(d)) + 0.5).attr('x2', (d) => Math.round(x(d)) + 0.5);
+    svg.append('g').selectAll('text').data(P.ticks).join('text').attr('class', 'tick')
+      .attr('x', m.l - 6).attr('y', (d) => y(d)).attr('dy', '0.32em').attr('text-anchor', 'end').text((d) => d);
+    svg.append('g').selectAll('text').data(xTicks).join('text').attr('class', 'tick')
+      .attr('x', (d) => x(d)).attr('y', H - m.b + 16).attr('text-anchor', (d) => (d === 60 ? 'end' : 'middle')).text((d) => (d === 60 ? '60%' : d));
+
+    const rad = small ? 2.6 : 3.2;
+    svg.append('g').selectAll('circle').data(regs).join('circle')
+      .attr('class', (r) => 'edv-dot edv-dot--soft edv-dot--' + P.cls + (turnout && r.compulsory ? ' edv-dot--aside' : ''))
+      .attr('r', rad).attr('cx', (r) => x(r.p)).attr('cy', (r) => y(r[P.key]));
+    const [x0, x1] = d3.extent(counted, (r) => r.p);
+    svg.append('line').attr('class', 'edv-trend')
+      .attr('x1', x(x0)).attr('x2', x(x1)).attr('y1', y(line.a + line.b * x0)).attr('y2', y(line.a + line.b * x1));
+
+    // countries: squares, labelled where a label fits
+    const sq = small ? 7 : 9;
+    svg.append('g').selectAll('rect').data(ctry).join('rect').attr('class', 'edv-ctry')
+      .attr('width', sq).attr('height', sq).attr('x', (c) => x(c.cp) - sq / 2).attr('y', (c) => y(c[P.ckey]) - sq / 2);
+    const taken = ctry.map((c) => ({ x0: x(c.cp) - sq / 2, x1: x(c.cp) + sq / 2, y0: y(c[P.ckey]) - sq / 2, y1: y(c[P.ckey]) + sq / 2 }));
+    const labels = [];
+    ctry.slice().sort((a, b) => a[P.ckey] - b[P.ckey]).forEach((c) => {
+      const code = SHOW_CODE[c.cc] || c.cc, w = code.length * 6.4 + 2, h = 11;
+      const cx = x(c.cp), cy = y(c[P.ckey]);
+      const cands = [[cx + sq / 2 + 3, cy - h / 2], [cx - sq / 2 - 3 - w, cy - h / 2], [cx - w / 2, cy - sq / 2 - 2 - h], [cx - w / 2, cy + sq / 2 + 2]];
+      for (const [bx, by] of cands) {
+        const b = { x0: bx, x1: bx + w, y0: by, y1: by + h };
+        if (b.x0 < m.l || b.x1 > W - m.r || b.y0 < 0 || b.y1 > H - m.b) continue;
+        if (taken.some((t) => !(b.x1 < t.x0 || b.x0 > t.x1 || b.y1 < t.y0 || b.y0 > t.y1))) continue;
+        taken.push(b);
+        labels.push({ code, x: bx + w / 2, y: by + h - 2 });
+        break;
+      }
+    });
+    svg.append('g').selectAll('text').data(labels).join('text').attr('class', 'edv-ctry-label')
+      .attr('x', (l) => l.x).attr('y', (l) => l.y).attr('text-anchor', 'middle').text((l) => l.code);
+
+    const ring = svg.append('circle').attr('class', 'focus-ring').attr('r', rad + 3).attr('visibility', 'hidden');
+    const ringSq = svg.append('rect').attr('class', 'focus-ring').attr('width', sq + 6).attr('height', sq + 6).attr('visibility', 'hidden');
+    const show = (d, isCountry) => {
+      const a = el.getBoundingClientRect(), b = svg.node().getBoundingClientRect();
+      const px = isCountry ? x(d.cp) : x(d.p), py = isCountry ? y(d[P.ckey]) : y(d[P.key]);
+      tip.show(isCountry ? countryTip(d.cc) : regionTip(d.id), b.left - a.left + px, b.top - a.top + py);
+    };
+    const mark = (id) => {
+      const r = regs.find((d) => d.id === id), c = !r && id ? ctry.find((d) => d.cc === id) : null;
+      ring.attr('visibility', r ? 'visible' : 'hidden');
+      if (r) ring.attr('cx', x(r.p)).attr('cy', y(r[P.key]));
+      ringSq.attr('visibility', c ? 'visible' : 'hidden');
+      if (c) ringSq.attr('x', x(c.cp) - sq / 2 - 3).attr('y', y(c[P.ckey]) - sq / 2 - 3);
+    };
+    ALLV = { mark };
+    svg.append('rect').attr('class', 'overlay').attr('width', W).attr('height', H).attr('aria-hidden', 'true')
+      .on('pointermove pointerdown', (ev) => {
+        const [px, py] = d3.pointer(ev);
+        let best = null, bd = 14, isC = false;
+        ctry.forEach((c) => { const dd = Math.hypot(x(c.cp) - px, y(c[P.ckey]) - py); if (dd < bd) { bd = dd; best = c; isC = true; } });
+        if (!best) regs.forEach((r) => { const dd = Math.hypot(x(r.p) - px, y(r[P.key]) - py); if (dd < bd) { bd = dd; best = r; } });
+        if (best) { mark(isC ? best.cc : best.id); show(best, isC); } else { tip.hide(); mark(state.focus); }
+      })
+      .on('pointerleave', () => { tip.hide(); mark(state.focus); });
+    if (state.focus != null) mark(state.focus);
+
+    $('#all-axes').innerHTML = '<span>Across: poverty risk, % of people</span><span>' + esc(P.axis[0].toUpperCase() + P.axis.slice(1)) + '</span>' +
+      '<span><i class="edv-sw edv-sw--' + P.cls + ' edv-sw--soft"></i>Region</span><span><i class="edv-sw edv-sw--ctry"></i>Country</span>';
+    $('#all-note').textContent = 'Overall trend across ' + counted.length + ' regions: 10 points more poverty risk go with ' +
+      f1(Math.abs(line.b * 10)) + ' points ' + (line.b < 0 ? 'lower ' : 'higher ') + P.noun + '. Rank correlation ρ ' + signed(rhoR) +
+      ' across regions, ' + signed(rhoC) + ' across ' + ctryCounted.length + ' countries.' +
+      (turnout ? ' Belgium and Luxembourg (compulsory voting) are not counted in the line.' : '') +
+      (ctry.length < 27 ? ' Without a national figure: ' + [...CTRY.values()].filter((c) => c.eu && !ctry.includes(c)).map((c) => c.name).sort().join(', ') + '.' : '');
+  }
+
   // ---------- small multiples ----------
   function drawPanels(el) {
     const W = Math.round(el.clientWidth);
@@ -538,7 +702,7 @@
       el.appendChild(div);
       const svg = d3.select(div).append('svg').attr('width', pw).attr('height', ph).attr('viewBox', '0 0 ' + pw + ' ' + ph)
         .attr('role', 'img').attr('aria-label', c.name + ', ' + c.pts.length + ' regions: ' + say + (c.rho == null ? '' : ' (rho ' + signed(c.rho) + ')') + '.' +
-          (c.aside.length ? ' Not counted, overseas: ' + c.aside.map((r) => r.name).join(', ') + '.' : ''));
+          (c.aside.length ? ' Not counted: ' + c.aside.map((r) => r.name).join(', ') + '.' : ''));
       const g = svg.append('g').attr('class', 'grid');
       g.selectAll('line.h').data(P.ticks).join('line').attr('class', 'h')
         .attr('x1', m.l).attr('x2', pw - m.r).attr('y1', (d) => Math.round(y(d)) + 0.5).attr('y2', (d) => Math.round(y(d)) + 0.5);
@@ -579,8 +743,9 @@
         .on('pointerleave', () => { tip.hide(); mark(state.focus, false); });
       if (state.focus != null) mark(state.focus, false);
     });
+    const reasons = [...new Set(list.flatMap((c) => c.aside.map((r) => asideOf(r, P.key))))].map((k) => ASIDE_KEY[k]);
     $('#axes').innerHTML = '<span>Across: poverty risk, % of people</span><span>' + esc(P.axis[0].toUpperCase() + P.axis.slice(1)) + '</span>' +
-      '<span><i class="edv-sw edv-sw--hollow edv-sw--hollow-' + P.cls + '"></i>France&rsquo;s overseas regions, not counted</span>';
+      (reasons.length ? '<span><i class="edv-sw edv-sw--hollow edv-sw--hollow-' + P.cls + '"></i>Not counted: ' + reasons.join('; ') + '</span>' : '');
     const single = d3.groups(REGIONS.filter((r) => r.eu), (r) => r.cc).filter(([, rows]) => rows.length === 1).map(([, rows]) => rows[0].country).sort();
     const without = countryStats(P.key).filter((c) => c.regions > 1 && c.pts.length < 2).map((c) => c.name).sort();
     $('#panels-note').textContent = 'Ordered by ρ: first the countries where the poorer regions ' + (P.dir < 0 ? 'turned out least' : 'voted most for the far right') + '. ' +
@@ -638,10 +803,17 @@
         main: feats.filter((f) => !outerSet.has(f.properties.id)),
         outer: OUTER.map((id) => feats.find((f) => f.properties.id === id)).filter(Boolean),
         countries: fc(layer('countries')),
+        countryFeats: layer('countries'),
+        countryById: new Map(layer('countries').map((f) => [f.properties.id, f])),
         byId: new Map(feats.map((f) => [f.properties.id, f])),
         dataCount: regions.filter((r) => r.eu).length,
       };
 
+      // national figures, one entry per country (from the first of its regions that has them)
+      const first = (rows, k) => { const r = rows.find((x) => x[k] != null); return r ? r[k] : null; };
+      CTRY = new Map(d3.groups(regions, (r) => r.cc).map(([cc, rows]) => [cc, {
+        cc, name: rows[0].country, eu: rows[0].eu, compulsory: rows[0].compulsory, n: rows.length,
+        cp: first(rows, 'cp'), ct: first(rows, 'ct'), cf: first(rows, 'cf') }]));
       renderHero();
       const eu = regions.filter((r) => r.eu);
       $('#map-intro').textContent = 'The ' + eu.length + ' regions of the 27 member states, with Switzerland for poverty risk. ' +
@@ -658,11 +830,16 @@
       const mapEl = $('#map');
       const redrawMap = () => { drawLegend(); drawMap(mapEl); };
       buildSeg($('#measure'), [['p', 'Poverty risk'], ['t', 'Turnout'], ['f', 'Far right']], 'measure', redrawMap);
+      buildSeg($('#level'), [['r', 'Regions'], ['c', 'Countries']], 'level', () => { state.pinned = null; state.focus = null; focus(null); drawMap(mapEl); });
       drawLegend();
       onWidth(mapEl, () => drawMap(mapEl));
       onWidth($('#legend'), drawLegend);
       initFind();
       $('#table').addEventListener('toggle', renderTable);
+
+      const allEl = $('#all');
+      buildSeg($('#ameasure'), [['t', 'Turnout'], ['f', 'Far right']], 'am', () => drawAll(allEl));
+      onWidth(allEl, () => drawAll(allEl));
 
       const panEl = $('#panels');
       buildSeg($('#pmeasure'), [['t', 'Turnout'], ['f', 'Far right']], 'pm', () => drawPanels(panEl));

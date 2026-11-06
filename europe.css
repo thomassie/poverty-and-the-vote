@@ -288,6 +288,12 @@
 .edv .edv-sw--hollow-blue { box-shadow: inset 0 0 0 1.5px var(--blue); }
 .edv .edv-sw--hollow-red { box-shadow: inset 0 0 0 1.5px var(--red); }
 .edv .edv-axes span { display: inline-flex; align-items: center; gap: 0.45rem; }
+.edv .edv-dot--soft { fill-opacity: 0.6; stroke-width: 0.75px; }
+.edv .edv-dot--soft.edv-dot--aside { fill-opacity: 1; }
+.edv .edv-ctry { fill: var(--paper); fill-opacity: 0.85; stroke: var(--ink); stroke-width: 1.75px; }
+.edv .edv-ctry-label { font-family: var(--font-support); font-size: 10px; fill: var(--ink); pointer-events: none; }
+.edv .edv-sw--soft { border-radius: 50%; opacity: 0.6; width: 10px; height: 10px; }
+.edv .edv-sw--ctry { width: 9px; height: 9px; border-radius: 0; background: var(--paper); box-shadow: inset 0 0 0 1.75px var(--ink); }
 .edv .edv-trend { stroke: var(--ink); stroke-width: 2px; stroke-linecap: round; pointer-events: none; }
 /* far-right lists */
 .edv .edv-lists { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr)); gap: 1.75rem 1.5rem; }
