@@ -94,7 +94,7 @@
       <h2 id="edv-h-countries">Country by country</h2>
       <p>Turnout and the far right&rsquo;s strength differ far more between countries than inside them: compulsory voting, national elections held the same day, each country&rsquo;s own parties. So each region is compared with the other regions of its own country.</p>
       <p>Hollow dots are shown but not counted. France&rsquo;s overseas regions, in the Caribbean, South America and the Indian Ocean, differ from mainland France in too many other ways. In Belgium the lists counted as far right stand only in the Dutch-speaking electoral college, so for the far right only the five Flemish provinces are compared.</p>
-      <p>Each dot is a region. The line follows the trend. &rho; (rho) ranks the regions by poverty risk and by the vote and measures how well the two rankings agree, from &minus;1 to +1; from &plusmn;0.2 we call it a difference.</p>
+      <p>Each dot is a region. The line follows the trend. &rho; (rho) ranks the regions by poverty risk and by the vote and measures how well the two rankings agree, from &minus;1 to +1; from &plusmn;0.2 we call it a difference. Most countries have few regions, so &rho; is uncertain: below it, the range within which it lies with 90% confidence. Where that range crosses zero, the label is grey and the line dashed: the country on its own cannot tell.</p>
     </div>
     <div class="block__body">
       <div class="seg" role="group" aria-label="Vote measure" id="edv-pmeasure"></div>
@@ -126,7 +126,7 @@
       <li>Ireland counts European votes by constituency, which do not match its regions, so it has national figures only. Malta, Cyprus, Estonia, Latvia and Luxembourg are one region each.</li>
       <li>Far right: lists whose party the PopuList&nbsp;4.0 marks as far right in the year of the election, as a share of valid votes. Joint lists count by their first-named party. Parties are matched through Party Facts numbers, and by hand where the numbers are missing or differ; every hand match is listed in the project&rsquo;s data notes.</li>
       <li>Poverty risk (at risk of poverty or social exclusion) is a Eurostat survey estimate for 2024, or the nearest year; for small regions its margin of error is several points. Its income line is 60% of each country&rsquo;s median, so it is best compared within a country.</li>
-      <li>Within each country, &rho; is the rank correlation (Spearman) over its regions, each region counted once whatever its size. The line is the median of the slopes between every pair of regions, so one unusual region cannot tip it. Only countries with at least three regions are counted in the figures at the top. France&rsquo;s overseas regions (Guadeloupe, Martinique, Guyane, La R&eacute;union, Mayotte) are left out of these comparisons; the Canary Islands, the Azores, Madeira, Ceuta and Melilla are counted with Spain and Portugal. Belgium elects its members in separate electoral colleges by language, and the lists counted as far right (Vlaams Belang, N-VA) stand only in the Dutch-speaking one; for the far right, only its five Flemish provinces are compared, not Wallonia and Brussels.</li>
+      <li>Within each country, &rho; is the rank correlation (Spearman) over its regions, each region counted once whatever its size. The line is the median of the slopes between every pair of regions, so one unusual region cannot tip it. Only countries with at least three regions are counted in the figures at the top. The 90% range of &rho; uses Fisher&rsquo;s z with the Bonett&ndash;Wright standard error; with three regions no range is given. Whether the countries together lean one way more often than chance would give is a two-sided sign test on the direction of &rho;, at 5%. France&rsquo;s overseas regions (Guadeloupe, Martinique, Guyane, La R&eacute;union, Mayotte) are left out of these comparisons; the Canary Islands, the Azores, Madeira, Ceuta and Melilla are counted with Spain and Portugal. Belgium elects its members in separate electoral colleges by language, and the lists counted as far right (Vlaams Belang, N-VA) stand only in the Dutch-speaking one; for the far right, only its five Flemish provinces are compared, not Wallonia and Brussels.</li>
       <li>The overall trend in &ldquo;All regions together&rdquo; is a least-squares line over all EU regions with a figure, each counted once; for turnout, Belgium and Luxembourg (compulsory voting) are left out of the line.</li>
       <li>This shows how voting and poverty go together, not that one causes the other: poorer regions also differ in age, in how rural they are, in language and in their regional parties.</li>
       <li>Switzerland is not in the EU and has no European election; its regions show poverty risk only. Swiss votes: <a href="${SWISS_PAGE}">People vs Parliament</a>.</li>
@@ -314,6 +314,20 @@
     const b = d3.median(s);
     return { b, a: d3.median(xs.map((x, i) => ys[i] - b * x)) };
   }
+  // 90% range of rho (Fisher z, Bonett-Wright standard error); none with three regions or fewer
+  function rhoInterval(rho, n) {
+    if (rho == null || n <= 3 || Math.abs(rho) >= 1) return null;
+    const z = Math.atanh(rho), se = Math.sqrt((1 + rho * rho / 2) / (n - 3));
+    return [Math.tanh(z - 1.645 * se), Math.tanh(z + 1.645 * se)];
+  }
+  // two-sided sign test: chance of k or more of n countries leaning one way if each were a coin toss
+  function signTest(k, n) {
+    if (!n) return 1;
+    const m = Math.max(k, n - k);
+    let p = 0, c = 1;
+    for (let i = 0; i <= n; i++) { if (i >= m) p += c; c = c * (n - i) / (i + 1); }
+    return Math.min(1, 2 * p / 2 ** n);
+  }
   // judged on rho as shown (two decimals), so the label and the printed value always agree
   const verdict = (rho) => { if (rho == null) return null; const r = Math.round(rho * 100) / 100; return r <= -CUT ? -1 : r >= CUT ? 1 : 0; };
 
@@ -324,7 +338,8 @@
       const pts = all.filter((r) => !asideOf(r, key)), aside = all.filter((r) => asideOf(r, key));
       const rho = spearman(pts.map((r) => r.p), pts.map((r) => r[key]));
       return { cc, name: rows[0].country, regions: rows.filter((r) => !asideOf(r, key)).length, compulsory: rows[0].compulsory,
-        pts, aside, rho, v: verdict(rho),
+        pts, aside, rho, v: verdict(rho), ci: rhoInterval(rho, pts.length),
+        get clear() { return !!this.ci && (this.ci[0] > 0 || this.ci[1] < 0); },
         line: pts.length >= 3 ? theilSen(pts.map((r) => r.p), pts.map((r) => r[key])) : null };
     });
   }
@@ -333,17 +348,21 @@
   function renderHero() {
     const tally = (key) => {
       const s = countryStats(key).filter((c) => c.pts.length >= 3 && !(key === 't24' && c.compulsory));
-      return { n: s.length, less: s.filter((c) => c.v === -1).length, more: s.filter((c) => c.v === 1).length, flat: s.filter((c) => c.v === 0).length };
+      const signs = s.filter((c) => c.rho != null && c.rho !== 0), neg = signs.filter((c) => c.rho < 0).length;
+      return { n: s.length, less: s.filter((c) => c.v === -1).length, more: s.filter((c) => c.v === 1).length, flat: s.filter((c) => c.v === 0).length,
+        clear: s.filter((c) => c.clear).length, chance: signTest(neg, signs.length) >= 0.05 };
     };
+    const certainty = (c) => ' Clear on its own in ' + (c.clear ? words(c.clear) : 'none') + ' of the ' + words(c.n) + '; most countries have too few regions to tell. ' +
+      (c.chance ? 'Taken together, they lean one way no more often than chance would give.' : 'Together, though, so many pointing the same way would hardly happen by chance.');
     const t = tally('t24'), f = tally('f24');
     $('#hero-t').innerHTML = t.less + '<small> of ' + t.n + '</small>';
     $('#hero-t-text').textContent = 'countries where the poorer regions turned out less in the 2024 European election. ' +
-      (t.more ? 'In ' + words(t.more) + ' they turned out more.' : 'In none did they turn out more.');
+      (t.more ? 'In ' + words(t.more) + ' they turned out more.' : 'In none did they turn out more.') + certainty(t);
     $('#hero-f').innerHTML = f.more + '<small> of ' + f.n + '</small>';
     const common = f.more >= 0.75 * f.n;
     $('#hero-f-text').textContent = 'countries where the poorer regions gave the far right more of their votes. ' +
       'In ' + words(f.less) + ' they gave it less' + (f.flat ? ', in ' + words(f.flat) + ' there was little difference' : '') +
-      (common ? '.' : ': no common pattern.');
+      (common ? '.' : ': no common pattern.') + certainty(f);
   }
 
   // ---------- map ----------
@@ -697,11 +716,14 @@
       const div = document.createElement('div');
       div.className = 'edv-panel';
       const say = c.rho == null ? 'Two regions only' : P.say[c.v];
-      div.innerHTML = '<p class="edv-panel__name">' + esc(c.name) + '</p><p class="edv-panel__say' + (c.v === P.dir ? ' is-dir' : '') + '">' +
-        esc(say) + (c.rho == null ? '' : ' <span>ρ ' + signed(c.rho) + '</span>') + '</p>';
+      const range = c.rho == null ? '' : '<span>' + c.pts.length + ' regions</span> · <span>' + (c.ci ? '90%: ' + signed(c.ci[0]) + ' to ' + signed(c.ci[1]) : 'too few to tell') + '</span>';
+      div.innerHTML = '<p class="edv-panel__name">' + esc(c.name) + '</p><p class="edv-panel__say' + (c.v === P.dir && c.clear ? ' is-dir' : '') +
+        (c.rho != null && !c.clear ? ' is-unsure' : '') + '">' +
+        esc(say) + (c.rho == null ? '' : ' <span>ρ ' + signed(c.rho) + '</span>') + '</p>' +
+        (range ? '<p class="edv-panel__range">' + range + '</p>' : '');
       el.appendChild(div);
       const svg = d3.select(div).append('svg').attr('width', pw).attr('height', ph).attr('viewBox', '0 0 ' + pw + ' ' + ph)
-        .attr('role', 'img').attr('aria-label', c.name + ', ' + c.pts.length + ' regions: ' + say + (c.rho == null ? '' : ' (rho ' + signed(c.rho) + ')') + '.' +
+        .attr('role', 'img').attr('aria-label', c.name + ', ' + c.pts.length + ' regions: ' + say + (c.rho == null ? '' : ' (rho ' + signed(c.rho) + ', ' + (c.ci ? '90% range ' + signed(c.ci[0]) + ' to ' + signed(c.ci[1]) + (c.clear ? '' : ', not clear on its own') : 'too few regions to tell') + ')') + '.' +
           (c.aside.length ? ' Not counted: ' + c.aside.map((r) => r.name).join(', ') + '.' : ''));
       const g = svg.append('g').attr('class', 'grid');
       g.selectAll('line.h').data(P.ticks).join('line').attr('class', 'h')
@@ -715,7 +737,7 @@
       if (c.line) {
         const [x0, x1] = d3.extent(c.pts, (r) => r.p);
         const clampY = (v) => Math.max(0, Math.min(P.ymax, v));
-        svg.append('line').attr('class', 'edv-trend')
+        svg.append('line').attr('class', 'edv-trend' + (c.clear ? '' : ' edv-trend--unsure'))
           .attr('x1', x(x0)).attr('x2', x(x1)).attr('y1', y(clampY(c.line.a + c.line.b * x0))).attr('y2', y(clampY(c.line.a + c.line.b * x1)));
       }
       svg.append('g').selectAll('circle').data(c.aside).join('circle')   // shown, not counted

@@ -276,6 +276,9 @@
 .edv .edv-panel__say { font-family: var(--font-support); font-size: 0.75rem; color: var(--muted); line-height: 1.3; min-height: 2.6em; }
 .edv .edv-panel__say.is-dir { color: var(--ink); }
 .edv .edv-panel__say span { white-space: nowrap; color: var(--muted); }
+.edv .edv-panel__say.is-unsure { color: var(--muted); }
+.edv .edv-panel__range { font-family: var(--font-support); font-size: 0.6875rem; color: var(--muted); line-height: 1.3; font-variant-numeric: tabular-nums; }
+.edv .edv-panel__range span { white-space: nowrap; }
 .edv .edv-panel svg { margin-top: 0.3rem; }
 .edv .chart text.tick { font-size: 10px; }
 .edv .edv-dot { stroke: var(--paper); stroke-width: 1px; }
@@ -295,6 +298,7 @@
 .edv .edv-sw--soft { border-radius: 50%; opacity: 0.6; width: 10px; height: 10px; }
 .edv .edv-sw--ctry { width: 9px; height: 9px; border-radius: 0; background: var(--paper); box-shadow: inset 0 0 0 1.75px var(--ink); }
 .edv .edv-trend { stroke: var(--ink); stroke-width: 2px; stroke-linecap: round; pointer-events: none; }
+.edv .edv-trend--unsure { stroke-dasharray: 2 4; stroke-opacity: 0.7; }
 /* far-right lists */
 .edv .edv-lists { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr)); gap: 1.75rem 1.5rem; }
 .edv .edv-list { display: grid; gap: 0.3rem; align-content: start; min-width: 0; }
