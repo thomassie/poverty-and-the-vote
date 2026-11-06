@@ -78,6 +78,7 @@
     <div class="block__rail">
       <h2 id="edv-h-countries">Country by country</h2>
       <p>Turnout and the far right&rsquo;s strength differ far more between countries than inside them: compulsory voting, national elections held the same day, each country&rsquo;s own parties. So each region is compared with the other regions of its own country.</p>
+      <p>Regions outside the European continent (the French overseas regions, the Canary Islands, the Azores, Madeira, Ceuta and Melilla) are shown as hollow dots but not counted: far from the mainland, they differ from it in too many other ways.</p>
       <p>Each dot is a region. The line follows the trend. &rho; (rho) ranks the regions by poverty risk and by the vote and measures how well the two rankings agree, from &minus;1 to +1; from &plusmn;0.2 we call it a difference.</p>
     </div>
     <div class="block__body">
@@ -110,7 +111,7 @@
       <li>Ireland counts European votes by constituency, which do not match its regions, so it has national figures only. Malta, Cyprus, Estonia, Latvia and Luxembourg are one region each.</li>
       <li>Far right: lists whose party the PopuList&nbsp;4.0 marks as far right in the year of the election, as a share of valid votes. Joint lists count by their first-named party. Parties are matched through Party Facts numbers, and by hand where the numbers are missing or differ; every hand match is listed in the project&rsquo;s data notes.</li>
       <li>Poverty risk (at risk of poverty or social exclusion) is a Eurostat survey estimate for 2024, or the nearest year; for small regions its margin of error is several points. Its income line is 60% of each country&rsquo;s median, so it is best compared within a country.</li>
-      <li>Within each country, &rho; is the rank correlation (Spearman) over its regions, each region counted once whatever its size. The line is the median of the slopes between every pair of regions, so one unusual region cannot tip it. Only countries with at least three regions are counted in the figures at the top.</li>
+      <li>Within each country, &rho; is the rank correlation (Spearman) over its regions, each region counted once whatever its size. The line is the median of the slopes between every pair of regions, so one unusual region cannot tip it. Only countries with at least three regions are counted in the figures at the top. Regions outside the European continent are left out of these comparisons: the EU&rsquo;s outermost regions (the French overseas regions, the Canary Islands, the Azores and Madeira) and the Spanish cities of Ceuta and Melilla on the North African coast.</li>
       <li>This shows how voting and poverty go together, not that one causes the other: poorer regions also differ in age, in how rural they are, in language and in their regional parties.</li>
       <li>Switzerland is not in the EU and has no European election; its regions show poverty risk only. Swiss votes: <a href="${SWISS_PAGE}">People vs Parliament</a>.</li>
     </ul>
@@ -141,6 +142,10 @@
   // outermost regions: drawn as insets under the map, so the map can stay on Europe
   const OUTER = ['PT20', 'PT30', 'ES70', 'FRY1', 'FRY2', 'FRY3', 'FRY4', 'FRY5'];
   const DROP = new Set(['NO0B']);   // Svalbard and Jan Mayen
+  // regions outside the European continent: the EU's outermost regions (Art. 349 TFEU) plus Ceuta and
+  // Melilla on the North African coast. On the map and in the table, but not counted when regions are
+  // compared within their country: far from the mainland, they differ from it in too many other ways.
+  const ASIDE = new Set([...OUTER, 'ES63', 'ES64']);
   // map extent in ETRS89 / LAEA Europe (EPSG:3035) metres: Iceland and Portugal to Cyprus, Crete to Lapland
   const EXTENT = { type: 'Polygon', coordinates: [[[2560000, 1380000], [6560000, 1380000], [6560000, 5340000], [2560000, 5340000], [2560000, 1380000]]] };
   const OTHER = { NO: 'Norway', IS: 'Iceland', LI: 'Liechtenstein', AL: 'Albania', BA: 'Bosnia and Herzegovina', ME: 'Montenegro',
@@ -290,9 +295,11 @@
   // per country: its regions with poverty risk and the vote measure
   function countryStats(key) {
     return d3.groups(REGIONS.filter((r) => r.eu), (r) => r.cc).map(([cc, rows]) => {
-      const pts = rows.filter((r) => r.p != null && r[key] != null);
+      const all = rows.filter((r) => r.p != null && r[key] != null);
+      const pts = all.filter((r) => !ASIDE.has(r.id)), aside = all.filter((r) => ASIDE.has(r.id));
       const rho = spearman(pts.map((r) => r.p), pts.map((r) => r[key]));
-      return { cc, name: rows[0].country, regions: rows.length, compulsory: rows[0].compulsory, pts, rho, v: verdict(rho),
+      return { cc, name: rows[0].country, regions: rows.filter((r) => !ASIDE.has(r.id)).length, compulsory: rows[0].compulsory,
+        pts, aside, rho, v: verdict(rho),
         line: pts.length >= 3 ? theilSen(pts.map((r) => r.p), pts.map((r) => r[key])) : null };
     });
   }
@@ -373,6 +380,7 @@
     if (r.b) notes.push(d3.format(',')(r.b) + ' ballots cast in 2024.');
     if (r.pflag && FLAG[r.pflag]) notes.push('Poverty risk: ' + FLAG[r.pflag] + '.');
     if (r.p == null) notes.push('No poverty figure for this region.');
+    if (ASIDE.has(r.id)) notes.push('Outside the European continent: not counted when the regions of ' + r.country + ' are compared.');
     [r.id, r.cc].forEach((k) => { if (NOTE[k]) notes.push(NOTE[k]); });
     if (notes.length) html += '<p class="tt__note">' + notes.map(esc).join(' ') + '</p>';
     return html;
@@ -529,7 +537,8 @@
         esc(say) + (c.rho == null ? '' : ' <span>ρ ' + signed(c.rho) + '</span>') + '</p>';
       el.appendChild(div);
       const svg = d3.select(div).append('svg').attr('width', pw).attr('height', ph).attr('viewBox', '0 0 ' + pw + ' ' + ph)
-        .attr('role', 'img').attr('aria-label', c.name + ', ' + c.pts.length + ' regions: ' + say + (c.rho == null ? '' : ' (rho ' + signed(c.rho) + ')') + '.');
+        .attr('role', 'img').attr('aria-label', c.name + ', ' + c.pts.length + ' regions: ' + say + (c.rho == null ? '' : ' (rho ' + signed(c.rho) + ')') + '.' +
+          (c.aside.length ? ' Not counted, outside the European continent: ' + c.aside.map((r) => r.name).join(', ') + '.' : ''));
       const g = svg.append('g').attr('class', 'grid');
       g.selectAll('line.h').data(P.ticks).join('line').attr('class', 'h')
         .attr('x1', m.l).attr('x2', pw - m.r).attr('y1', (d) => Math.round(y(d)) + 0.5).attr('y2', (d) => Math.round(y(d)) + 0.5);
@@ -545,11 +554,13 @@
         svg.append('line').attr('class', 'edv-trend')
           .attr('x1', x(x0)).attr('x2', x(x1)).attr('y1', y(clampY(c.line.a + c.line.b * x0))).attr('y2', y(clampY(c.line.a + c.line.b * x1)));
       }
+      svg.append('g').selectAll('circle').data(c.aside).join('circle')   // shown, not counted
+        .attr('class', 'edv-dot edv-dot--aside edv-dot--' + P.cls).attr('r', rad).attr('cx', (r) => x(r.p)).attr('cy', (r) => y(r[P.key]));
       svg.append('g').selectAll('circle').data(c.pts).join('circle')
         .attr('class', 'edv-dot edv-dot--' + P.cls).attr('r', rad).attr('cx', (r) => x(r.p)).attr('cy', (r) => y(r[P.key]));
       const ring = svg.append('circle').attr('class', 'focus-ring').attr('r', rad + 3).attr('visibility', 'hidden');
       const mark = (id, show) => {
-        const r = c.pts.find((d) => d.id === id);
+        const r = c.pts.find((d) => d.id === id) || c.aside.find((d) => d.id === id);
         if (!r) { ring.attr('visibility', 'hidden'); return; }
         ring.attr('cx', x(r.p)).attr('cy', y(r[P.key])).attr('visibility', 'visible');
         if (show) {
@@ -562,13 +573,14 @@
         .on('pointermove pointerdown', (ev) => {
           const [px, py] = d3.pointer(ev);
           let best = null, bd = 16;
-          c.pts.forEach((r) => { const dd = Math.hypot(x(r.p) - px, y(r[P.key]) - py); if (dd < bd) { bd = dd; best = r; } });
+          c.pts.concat(c.aside).forEach((r) => { const dd = Math.hypot(x(r.p) - px, y(r[P.key]) - py); if (dd < bd) { bd = dd; best = r; } });
           if (best) mark(best.id, true); else { tip.hide(); mark(state.focus, false); }
         })
         .on('pointerleave', () => { tip.hide(); mark(state.focus, false); });
       if (state.focus != null) mark(state.focus, false);
     });
-    $('#axes').innerHTML = '<span>Across: poverty risk, % of people</span><span>' + esc(P.axis[0].toUpperCase() + P.axis.slice(1)) + '</span>';
+    $('#axes').innerHTML = '<span>Across: poverty risk, % of people</span><span>' + esc(P.axis[0].toUpperCase() + P.axis.slice(1)) + '</span>' +
+      '<span><i class="edv-sw edv-sw--hollow edv-sw--hollow-' + P.cls + '"></i>Outside the European continent, not counted</span>';
     const single = d3.groups(REGIONS.filter((r) => r.eu), (r) => r.cc).filter(([, rows]) => rows.length === 1).map(([, rows]) => rows[0].country).sort();
     const without = countryStats(P.key).filter((c) => c.regions > 1 && c.pts.length < 2).map((c) => c.name).sort();
     $('#panels-note').textContent = 'Ordered by ρ: first the countries where the poorer regions ' + (P.dir < 0 ? 'turned out least' : 'voted most for the far right') + '. ' +

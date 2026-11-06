@@ -281,6 +281,13 @@
 .edv .edv-dot { stroke: var(--paper); stroke-width: 1px; }
 .edv .edv-dot--blue { fill: var(--blue); }
 .edv .edv-dot--red { fill: var(--red); }
+.edv .edv-dot--aside { fill: var(--paper); stroke-width: 1.5px; }
+.edv .edv-dot--aside.edv-dot--blue { stroke: var(--blue); }
+.edv .edv-dot--aside.edv-dot--red { stroke: var(--red); }
+.edv .edv-sw--hollow { border-radius: 50%; width: 10px; height: 10px; background: var(--paper); }
+.edv .edv-sw--hollow-blue { box-shadow: inset 0 0 0 1.5px var(--blue); }
+.edv .edv-sw--hollow-red { box-shadow: inset 0 0 0 1.5px var(--red); }
+.edv .edv-axes span { display: inline-flex; align-items: center; gap: 0.45rem; }
 .edv .edv-trend { stroke: var(--ink); stroke-width: 2px; stroke-linecap: round; pointer-events: none; }
 /* far-right lists */
 .edv .edv-lists { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr)); gap: 1.75rem 1.5rem; }
