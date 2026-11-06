@@ -78,7 +78,7 @@
     <div class="block__rail">
       <h2 id="edv-h-countries">Country by country</h2>
       <p>Turnout and the far right&rsquo;s strength differ far more between countries than inside them: compulsory voting, national elections held the same day, each country&rsquo;s own parties. So each region is compared with the other regions of its own country.</p>
-      <p>Regions outside the European continent (the French overseas regions, the Canary Islands, the Azores, Madeira, Ceuta and Melilla) are shown as hollow dots but not counted: far from the mainland, they differ from it in too many other ways.</p>
+      <p>France&rsquo;s overseas regions, in the Caribbean, South America and the Indian Ocean, are shown as hollow dots but not counted: far from Europe, they differ from mainland France in too many other ways.</p>
       <p>Each dot is a region. The line follows the trend. &rho; (rho) ranks the regions by poverty risk and by the vote and measures how well the two rankings agree, from &minus;1 to +1; from &plusmn;0.2 we call it a difference.</p>
     </div>
     <div class="block__body">
@@ -111,7 +111,7 @@
       <li>Ireland counts European votes by constituency, which do not match its regions, so it has national figures only. Malta, Cyprus, Estonia, Latvia and Luxembourg are one region each.</li>
       <li>Far right: lists whose party the PopuList&nbsp;4.0 marks as far right in the year of the election, as a share of valid votes. Joint lists count by their first-named party. Parties are matched through Party Facts numbers, and by hand where the numbers are missing or differ; every hand match is listed in the project&rsquo;s data notes.</li>
       <li>Poverty risk (at risk of poverty or social exclusion) is a Eurostat survey estimate for 2024, or the nearest year; for small regions its margin of error is several points. Its income line is 60% of each country&rsquo;s median, so it is best compared within a country.</li>
-      <li>Within each country, &rho; is the rank correlation (Spearman) over its regions, each region counted once whatever its size. The line is the median of the slopes between every pair of regions, so one unusual region cannot tip it. Only countries with at least three regions are counted in the figures at the top. Regions outside the European continent are left out of these comparisons: the EU&rsquo;s outermost regions (the French overseas regions, the Canary Islands, the Azores and Madeira) and the Spanish cities of Ceuta and Melilla on the North African coast.</li>
+      <li>Within each country, &rho; is the rank correlation (Spearman) over its regions, each region counted once whatever its size. The line is the median of the slopes between every pair of regions, so one unusual region cannot tip it. Only countries with at least three regions are counted in the figures at the top. France&rsquo;s overseas regions (Guadeloupe, Martinique, Guyane, La R&eacute;union, Mayotte) are left out of these comparisons; the Canary Islands, the Azores, Madeira, Ceuta and Melilla are counted with Spain and Portugal.</li>
       <li>This shows how voting and poverty go together, not that one causes the other: poorer regions also differ in age, in how rural they are, in language and in their regional parties.</li>
       <li>Switzerland is not in the EU and has no European election; its regions show poverty risk only. Swiss votes: <a href="${SWISS_PAGE}">People vs Parliament</a>.</li>
     </ul>
@@ -142,10 +142,10 @@
   // outermost regions: drawn as insets under the map, so the map can stay on Europe
   const OUTER = ['PT20', 'PT30', 'ES70', 'FRY1', 'FRY2', 'FRY3', 'FRY4', 'FRY5'];
   const DROP = new Set(['NO0B']);   // Svalbard and Jan Mayen
-  // regions outside the European continent: the EU's outermost regions (Art. 349 TFEU) plus Ceuta and
-  // Melilla on the North African coast. On the map and in the table, but not counted when regions are
-  // compared within their country: far from the mainland, they differ from it in too many other ways.
-  const ASIDE = new Set([...OUTER, 'ES63', 'ES64']);
+  // France's overseas regions (Caribbean, South America, Indian Ocean): on the map and in the table, but
+  // not counted when regions are compared within France; far from Europe, they differ from the mainland
+  // in too many other ways. Spain's and Portugal's islands, Ceuta and Melilla stay in (decision 6 Nov 2026).
+  const ASIDE = new Set(['FRY1', 'FRY2', 'FRY3', 'FRY4', 'FRY5']);
   // map extent in ETRS89 / LAEA Europe (EPSG:3035) metres: Iceland and Portugal to Cyprus, Crete to Lapland
   const EXTENT = { type: 'Polygon', coordinates: [[[2560000, 1380000], [6560000, 1380000], [6560000, 5340000], [2560000, 5340000], [2560000, 1380000]]] };
   const OTHER = { NO: 'Norway', IS: 'Iceland', LI: 'Liechtenstein', AL: 'Albania', BA: 'Bosnia and Herzegovina', ME: 'Montenegro',
@@ -380,7 +380,7 @@
     if (r.b) notes.push(d3.format(',')(r.b) + ' ballots cast in 2024.');
     if (r.pflag && FLAG[r.pflag]) notes.push('Poverty risk: ' + FLAG[r.pflag] + '.');
     if (r.p == null) notes.push('No poverty figure for this region.');
-    if (ASIDE.has(r.id)) notes.push('Outside the European continent: not counted when the regions of ' + r.country + ' are compared.');
+    if (ASIDE.has(r.id)) notes.push('Overseas region: not counted when the regions of ' + r.country + ' are compared.');
     [r.id, r.cc].forEach((k) => { if (NOTE[k]) notes.push(NOTE[k]); });
     if (notes.length) html += '<p class="tt__note">' + notes.map(esc).join(' ') + '</p>';
     return html;
@@ -538,7 +538,7 @@
       el.appendChild(div);
       const svg = d3.select(div).append('svg').attr('width', pw).attr('height', ph).attr('viewBox', '0 0 ' + pw + ' ' + ph)
         .attr('role', 'img').attr('aria-label', c.name + ', ' + c.pts.length + ' regions: ' + say + (c.rho == null ? '' : ' (rho ' + signed(c.rho) + ')') + '.' +
-          (c.aside.length ? ' Not counted, outside the European continent: ' + c.aside.map((r) => r.name).join(', ') + '.' : ''));
+          (c.aside.length ? ' Not counted, overseas: ' + c.aside.map((r) => r.name).join(', ') + '.' : ''));
       const g = svg.append('g').attr('class', 'grid');
       g.selectAll('line.h').data(P.ticks).join('line').attr('class', 'h')
         .attr('x1', m.l).attr('x2', pw - m.r).attr('y1', (d) => Math.round(y(d)) + 0.5).attr('y2', (d) => Math.round(y(d)) + 0.5);
@@ -580,7 +580,7 @@
       if (state.focus != null) mark(state.focus, false);
     });
     $('#axes').innerHTML = '<span>Across: poverty risk, % of people</span><span>' + esc(P.axis[0].toUpperCase() + P.axis.slice(1)) + '</span>' +
-      '<span><i class="edv-sw edv-sw--hollow edv-sw--hollow-' + P.cls + '"></i>Outside the European continent, not counted</span>';
+      '<span><i class="edv-sw edv-sw--hollow edv-sw--hollow-' + P.cls + '"></i>France&rsquo;s overseas regions, not counted</span>';
     const single = d3.groups(REGIONS.filter((r) => r.eu), (r) => r.cc).filter(([, rows]) => rows.length === 1).map(([, rows]) => rows[0].country).sort();
     const without = countryStats(P.key).filter((c) => c.regions > 1 && c.pts.length < 2).map((c) => c.name).sort();
     $('#panels-note').textContent = 'Ordered by ρ: first the countries where the poorer regions ' + (P.dir < 0 ? 'turned out least' : 'voted most for the far right') + '. ' +
