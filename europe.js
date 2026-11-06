@@ -49,7 +49,7 @@
     <div class="block__rail">
       <h2 id="edv-h-map">Region by region</h2>
       <p id="edv-map-intro">The regions of the 27 member states.</p>
-      <p>Poverty risk is the share of people at risk of poverty or social exclusion: with an income below 60% of their country&rsquo;s median, unable to afford basic things, or in a household where hardly anyone works.</p>
+      <p>Poverty risk is the share of people at risk of poverty or social exclusion: with an income below 60% of their country&rsquo;s median, unable to afford basic things, or in a household where hardly anyone works. <a href="#edv-glossary">What the terms mean</a>.</p>
     </div>
     <div class="block__body">
       <div class="seg" role="group" aria-label="Measure shown on the map" id="edv-measure"></div>
@@ -116,6 +116,36 @@
     </div>
   </section>
 </div>
+
+<section class="foot glossary wrap" id="edv-glossary" aria-labelledby="edv-h-glossary">
+  <h2 id="edv-h-glossary">Terms used here</h2>
+  <dl>
+    <dt>Poverty risk</dt>
+    <dd>Short for &ldquo;at risk of poverty or social exclusion&rdquo;, the EU&rsquo;s headline measure of poverty (Eurostat, AROPE). A person counts if at least one of three things applies, and is counted once even if several do:
+      <ul>
+        <li><b>Low income:</b> the household&rsquo;s disposable income, after taxes and social benefits and adjusted for household size, is below 60% of the national median. The line is relative: it is far higher in euros in Luxembourg than in Bulgaria.</li>
+        <li><b>Severe material and social deprivation:</b> the household cannot afford at least 7 of 13 everyday items, such as an unexpected expense, a week&rsquo;s holiday away, keeping the home warm, replacing worn-out clothes or meeting friends for a drink or meal once a month.</li>
+        <li><b>Very low work intensity:</b> the adults of working age in the household (18&ndash;64) worked no more than a fifth of the time they could have in the past year.</li>
+      </ul>
+      It is a survey estimate (EU-SILC), so for small regions it can be several points off. It is not the same as being poor in the everyday sense, nor as receiving welfare.</dd>
+    <dt>Region</dt>
+    <dd>A NUTS&nbsp;2 region, the EU&rsquo;s standard middle level of statistical regions, usually between 0.8 and 3 million people: a German <i>Regierungsbezirk</i> or small <i>Land</i>, an Italian or Spanish region, a French region as drawn before 2016.</dd>
+    <dt>Turnout</dt>
+    <dd>Ballots cast as a share of registered voters. Where voting is compulsory (Belgium, Luxembourg) it says little about willingness to vote.</dd>
+    <dt>Valid votes</dt>
+    <dd>Ballots that count for a list, without blank and spoiled ballots. Party shares are shares of valid votes.</dd>
+    <dt>Far right</dt>
+    <dd>Parties the PopuList classifies as nativist (the state should belong to the native group, and outsiders threaten it) and authoritarian (a strictly ordered society, with crime and disorder punished severely). It includes both radical-right parties that accept democracy and extreme-right ones that reject it.</dd>
+    <dt>Rank correlation (&rho;)</dt>
+    <dd>Sort a country&rsquo;s regions by poverty risk and again by turnout (or the far right), then compare the two orders. +1: the poorer the region, the higher the vote, always; &minus;1: always lower; 0: no relation. It uses only the order, so one extreme region cannot dominate it.</dd>
+    <dt>90% range</dt>
+    <dd>With few regions, &rho; could have come out quite differently by chance. The range shows the values it plausibly takes: if it crosses zero, the country on its own cannot tell whether poorer regions vote more or less.</dd>
+    <dt>Trend line</dt>
+    <dd>In the country panels, the median of the slopes between every pair of regions (Theil&ndash;Sen), which one unusual region cannot tip. In &ldquo;All regions together&rdquo;, an ordinary least-squares line.</dd>
+    <dt>By chance</dt>
+    <dd>If poverty made no difference, each country would lean one way or the other like a coin toss. When far more countries lean the same way than coin tosses would plausibly give (less than a 5% chance), we say it would hardly happen by chance.</dd>
+  </dl>
+</section>
 
 <section class="foot wrap" aria-label="How this is counted">
   <h2>How this is counted</h2>

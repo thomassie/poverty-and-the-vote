@@ -189,6 +189,13 @@
 .edv .foot { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: var(--gap); padding-block: clamp(2.5rem, 6vw, 4rem); }
 .edv .foot h2 { font-size: var(--step-1); }
 .edv .foot ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.5rem; color: var(--muted); max-width: 44rem; }
+.edv .glossary { padding-bottom: 0; }
+.edv .glossary dl { margin: 0; display: grid; gap: 0.35rem 0; max-width: 44rem; }
+.edv .glossary dt { font-weight: 500; color: var(--ink); margin-top: 0.85rem; }
+.edv .glossary dt:first-child { margin-top: 0; }
+.edv .glossary dd { margin: 0; color: var(--muted); }
+.edv .glossary dd ul { margin: 0.4rem 0; }
+.edv .glossary b { font-weight: 500; color: var(--ink); }
 .edv .foot .credit { font-family: var(--font-support); margin-top: 1.25rem; font-size: var(--step--1); color: var(--muted); }
 .edv .error { padding: 1rem 1.25rem; border-radius: var(--radius); border: 1px solid var(--red); }
 
