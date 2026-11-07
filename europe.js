@@ -93,6 +93,7 @@
     <div class="block__rail">
       <h2 id="edv-h-countries">Country by country</h2>
       <p>Turnout and the far right&rsquo;s strength differ far more between countries than inside them: compulsory voting, national elections held the same day, each country&rsquo;s own parties. So each region is compared with the other regions of its own country.</p>
+      <p>The two change views ask the same question of how turnout and the far right&rsquo;s share moved between the European elections of 2019 and 2024, in percentage points: did poorer regions fall further behind, or catch up?</p>
       <p>Hollow dots are shown but not counted. France&rsquo;s overseas regions, in the Caribbean, South America and the Indian Ocean, differ from mainland France in too many other ways. In Belgium the lists counted as far right stand only in the Dutch-speaking electoral college, so for the far right only the five Flemish provinces are compared.</p>
       <p>Each circle is a region, its area the number of registered voters. Every region counts once, whatever its size, in &rho;, its range and the line. The line follows the trend. &rho; (rho) ranks the regions by poverty risk and by the vote and measures how well the two rankings agree, from &minus;1 to +1; from &plusmn;0.2 we call it a difference. Most countries have few regions, so &rho; is uncertain: below it, the range within which it lies with 90% confidence. Where that range crosses zero, the label is grey and the line dashed: the country on its own cannot tell.</p>
     </div>
@@ -157,6 +158,7 @@
       <li>Far right: lists whose party the PopuList&nbsp;4.0 marks as far right in the year of the election, as a share of valid votes. Joint lists count by their first-named party. Parties are matched through Party Facts numbers, and by hand where the numbers are missing or differ; every hand match is listed in the project&rsquo;s data notes.</li>
       <li>Poverty risk (at risk of poverty or social exclusion) is a Eurostat survey estimate for 2024, or the nearest year; for small regions its margin of error is several points. Its income line is 60% of each country&rsquo;s median, so it is best compared within a country.</li>
       <li>Within each country, &rho; is the rank correlation (Spearman) over its regions, each region counted once whatever its size. The line is the median of the slopes between every pair of regions, so one unusual region cannot tip it. Only countries with at least three regions are counted in the figures at the top. The 90% range of &rho; uses Fisher&rsquo;s z with the Bonett&ndash;Wright standard error; with three regions no range is given. Circle area shows the region&rsquo;s registered voters in 2024 (for Antwerp, where the source has none by region, ballots cast); it is only for reading the charts, and every region still counts once in &rho;, the ranges and the lines. Whether the countries together lean one way more often than chance would give is a two-sided sign test on the direction of &rho;, at 5%. France&rsquo;s overseas regions (Guadeloupe, Martinique, Guyane, La R&eacute;union, Mayotte) are left out of these comparisons; the Canary Islands, the Azores, Madeira, Ceuta and Melilla are counted with Spain and Portugal. Belgium elects its members in separate electoral colleges by language, and the lists counted as far right (Vlaams Belang, N-VA) stand only in the Dutch-speaking one; for the far right, only its five Flemish provinces are compared, not Wallonia and Brussels.</li>
+      <li>Change 2019 to 2024 is the difference in percentage points between the two elections, both counted on the regions of 2024. Far right follows the PopuList&rsquo;s classification in each year, so a party counts from the year it is classified as far right. Turnout changes also reflect other elections held the same day in part of a country.</li>
       <li>The overall trend in &ldquo;All regions together&rdquo; is a least-squares line over all EU regions with a figure, each counted once; for turnout, Belgium and Luxembourg (compulsory voting) are left out of the line.</li>
       <li>This shows how voting and poverty go together, not that one causes the other: poorer regions also differ in age, in how rural they are, in language and in their regional parties.</li>
       <li>Switzerland is not in the EU and has no European election; its regions show poverty risk only. Swiss votes: <a href="${SWISS_PAGE}">People vs Parliament</a>.</li>
@@ -182,6 +184,13 @@
     f: { key: 'f24', ckey: 'cf', noun: 'far-right share', short: 'Far right', cls: 'red', ymax: 75, ticks: [0, 25, 50, 75], dir: 1,
       axis: 'up: far right 2024, % of valid votes',
       say: { 1: 'Poorer regions: more far right', '-1': 'Poorer regions: less far right', 0: 'Little difference' } },
+    // change between the two elections, percentage points (regions as of NUTS 2024 for both years)
+    dt: { key: 'dt', noun: 'change in turnout', short: 'Turnout change', cls: 'blue', change: true, ymin: -30, ymax: 30, ticks: [-30, -15, 0, 15, 30], dir: -1,
+      axis: 'up: change in turnout 2019 to 2024, percentage points',
+      say: { '-1': 'Poorer regions fell behind', 1: 'Poorer regions caught up', 0: 'Little difference' } },
+    df: { key: 'df', noun: 'change in far-right share', short: 'Far-right change', cls: 'red', change: true, ymin: -15, ymax: 25, ticks: [-10, 0, 10, 20], dir: 1,
+      axis: 'up: change in far-right share 2019 to 2024, percentage points',
+      say: { 1: 'Far right grew more in poorer regions', '-1': 'Far right grew less in poorer regions', 0: 'Little difference' } },
   };
   const CUT = 0.2;   // |rho| from which a country counts as showing a difference
   const X_MAX = 60;  // poverty risk axis of the small multiples (highest region: 59.5%)
@@ -195,7 +204,7 @@
   // only in the Dutch-speaking electoral college, so only the Flemish provinces (BE2x) are compared.
   const OVERSEAS = new Set(['FRY1', 'FRY2', 'FRY3', 'FRY4', 'FRY5']);
   const asideOf = (r, key) => (OVERSEAS.has(r.id) ? 'overseas'
-    : key === 'f24' && r.cc === 'BE' && !r.id.startsWith('BE2') ? 'college' : null);
+    : (key === 'f24' || key === 'df') && r.cc === 'BE' && !r.id.startsWith('BE2') ? 'college' : null);
   const ASIDE_KEY = { overseas: 'France&rsquo;s overseas regions', college: 'Wallonia and Brussels (far right)' };
   const SHOW_CODE = { EL: 'GR' };   // Eurostat writes Greece EL
   // map extent in ETRS89 / LAEA Europe (EPSG:3035) metres: Iceland and Portugal to Cyprus, Crete to Lapland
@@ -225,7 +234,7 @@
     const m = localStorage.getItem(STORE.measure); if (MEASURES[m]) state.measure = m;
     const l = localStorage.getItem(STORE.level); if (l === 'r' || l === 'c') state.level = l;
     const p = localStorage.getItem(STORE.pm); if (PMEASURES[p]) state.pm = p;
-    const a = localStorage.getItem(STORE.am); if (PMEASURES[a]) state.am = a;
+    const a = localStorage.getItem(STORE.am); if (a === 't' || a === 'f') state.am = a;
   } catch (e) { /* storage unavailable */ }
 
   let REGIONS = [], BY_ID = new Map(), COUNT = new Map(), CTRY = new Map(), MAP = null, MAPV = null, ALLV = null;
@@ -747,7 +756,9 @@
     const ph = Math.round(pw * 0.68);
     const m = { t: 8, r: 8, b: 18, l: small ? 20 : 24 };
     const x = d3.scaleLinear().domain([0, X_MAX]).range([m.l, pw - m.r]);
-    const y = d3.scaleLinear().domain([0, P.ymax]).range([ph - m.b, m.t]);
+    const ymin = P.ymin || 0;
+    const y = d3.scaleLinear().domain([ymin, P.ymax]).range([ph - m.b, m.t]);
+    const tickText = (d) => (P.change && d > 0 ? '+' + d : d < 0 ? '−' + Math.abs(d) : String(d));
     const order = (a, b) => (a.rho == null) - (b.rho == null) || (P.dir < 0 ? a.rho - b.rho : b.rho - a.rho) || d3.ascending(a.name, b.name);
     const list = countryStats(P.key).filter((c) => c.pts.length >= 2).sort(order);
     el.querySelectorAll('.edv-panel').forEach((n) => n.remove());
@@ -767,17 +778,17 @@
         .attr('role', 'img').attr('aria-label', c.name + ', ' + c.pts.length + ' regions: ' + say + (c.rho == null ? '' : ' (rho ' + signed(c.rho) + ', ' + (c.ci ? '90% range ' + signed(c.ci[0]) + ' to ' + signed(c.ci[1]) + (c.clear ? '' : ', not clear on its own') : 'too few regions to tell') + ')') + '.' +
           (c.aside.length ? ' Not counted: ' + c.aside.map((r) => r.name).join(', ') + '.' : ''));
       const g = svg.append('g').attr('class', 'grid');
-      g.selectAll('line.h').data(P.ticks).join('line').attr('class', 'h')
+      g.selectAll('line.h').data(P.ticks).join('line').attr('class', (d) => (P.change && d === 0 ? 'h edv-zero' : 'h'))
         .attr('x1', m.l).attr('x2', pw - m.r).attr('y1', (d) => Math.round(y(d)) + 0.5).attr('y2', (d) => Math.round(y(d)) + 0.5);
       g.selectAll('line.v').data([0, 20, 40, 60]).join('line').attr('class', 'v')
         .attr('y1', m.t).attr('y2', ph - m.b).attr('x1', (d) => Math.round(x(d)) + 0.5).attr('x2', (d) => Math.round(x(d)) + 0.5);
       svg.append('g').selectAll('text').data(P.ticks).join('text').attr('class', 'tick')
-        .attr('x', m.l - 5).attr('y', (d) => y(d)).attr('dy', '0.32em').attr('text-anchor', 'end').text((d) => d);
+        .attr('x', m.l - 5).attr('y', (d) => y(d)).attr('dy', '0.32em').attr('text-anchor', 'end').text(tickText);
       svg.append('g').selectAll('text').data([0, 20, 40, 60]).join('text').attr('class', 'tick')
         .attr('x', (d) => x(d)).attr('y', ph - m.b + 13).attr('text-anchor', (d) => (d === 60 ? 'end' : 'middle')).text((d) => (d === 60 ? '60%' : d));
       if (c.line) {
         const [x0, x1] = d3.extent(c.pts, (r) => r.p);
-        const clampY = (v) => Math.max(0, Math.min(P.ymax, v));
+        const clampY = (v) => Math.max(ymin, Math.min(P.ymax, v));
         svg.append('line').attr('class', 'edv-trend' + (c.clear ? '' : ' edv-trend--unsure'))
           .attr('x1', x(x0)).attr('x2', x(x1)).attr('y1', y(clampY(c.line.a + c.line.b * x0))).attr('y2', y(clampY(c.line.a + c.line.b * x1)));
       }
@@ -812,9 +823,12 @@
       (reasons.length ? '<span><i class="edv-sw edv-sw--hollow edv-sw--hollow-' + P.cls + '"></i>Not counted: ' + reasons.join('; ') + '</span>' : '');
     const single = d3.groups(REGIONS.filter((r) => r.eu), (r) => r.cc).filter(([, rows]) => rows.length === 1).map(([, rows]) => rows[0].country).sort();
     const without = countryStats(P.key).filter((c) => c.regions > 1 && c.pts.length < 2).map((c) => c.name).sort();
-    $('#panels-note').textContent = 'Ordered by ρ: first the countries where the poorer regions ' + (P.dir < 0 ? 'turned out least' : 'voted most for the far right') + '. ' +
+    const first = { t: 'turned out least', f: 'voted most for the far right', dt: 'fell furthest behind in turnout', df: 'saw the far right grow most' }[state.pm];
+    $('#panels-note').textContent = 'Ordered by ρ: first the countries where the poorer regions ' + first + '. ' +
       'One region only: ' + single.join(', ') + '. ' + (without.length ? 'No regional results: ' + without.join(', ') + '. ' : '') +
-      (state.pm === 't' ? 'Belgium and Luxembourg have compulsory voting.' : '');
+      (state.pm === 't' || state.pm === 'dt' ? 'Belgium and Luxembourg have compulsory voting. ' : '') +
+      (state.pm === 'dt' ? 'Turnout changes also reflect other elections held the same day in part of a country, such as regional elections in 12 Spanish regions in 2019 and local elections in eight German states in 2024. ' : '') +
+      (state.pm === 'dt' || state.pm === 'df' ? 'Saarland has no turnout for 2024.' : '');
   }
 
   // ---------- far-right lists ----------
@@ -856,6 +870,11 @@
   Promise.all([getJSON('data/regions.json'), getJSON('data/summary.json', true), getJSON('data/far_right_lists.json', true),
                getJSON('data/regions.topo.json')])
     .then(([regions, sumRows, lists, topo]) => {
+      // change 2019 to 2024 in percentage points, where both elections have a figure
+      regions.forEach((r) => {
+        r.dt = r.t19 != null && r.t24 != null ? Math.round((r.t24 - r.t19) * 10) / 10 : null;
+        r.df = r.f19 != null && r.f24 != null ? Math.round((r.f24 - r.f19) * 10) / 10 : null;
+      });
       REGIONS = regions;
       VMAX = d3.max(regions.filter((r) => r.eu), voters) || 1;
       BY_ID = new Map(regions.map((r) => [r.id, r]));
@@ -907,7 +926,7 @@
       onWidth(allEl, () => drawAll(allEl));
 
       const panEl = $('#panels');
-      buildSeg($('#pmeasure'), [['t', 'Turnout'], ['f', 'Far right']], 'pm', () => drawPanels(panEl));
+      buildSeg($('#pmeasure'), [['t', 'Turnout'], ['f', 'Far right'], ['dt', 'Turnout change'], ['df', 'Far-right change']], 'pm', () => drawPanels(panEl));
       onWidth(panEl, () => drawPanels(panEl));
 
       if (lists) renderLists(lists);

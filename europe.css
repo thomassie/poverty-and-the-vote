@@ -309,6 +309,7 @@
 .edv .edv-ctry-label { font-family: var(--font-support); font-size: 10px; fill: var(--ink); pointer-events: none; }
 .edv .edv-sw--soft { border-radius: 50%; opacity: 0.6; width: 10px; height: 10px; }
 .edv .edv-sw--ctry { width: 9px; height: 9px; border-radius: 0; background: var(--paper); box-shadow: inset 0 0 0 1.75px var(--ink); }
+.edv .chart .grid line.edv-zero { stroke: var(--muted); stroke-opacity: 0.9; }
 .edv .edv-trend { stroke: var(--ink); stroke-width: 2px; stroke-linecap: round; pointer-events: none; }
 .edv .edv-trend--unsure { stroke-dasharray: 2 4; stroke-opacity: 0.7; }
 /* far-right lists */
