@@ -514,14 +514,24 @@
       return '<p class="tt__meta">Not in the EU</p><p class="tt__title">' + esc(OTHER[cc] || cc) +
         '</p><p class="tt__note">No European election, no figures here.</p>';
     }
-    let html = '<p class="tt__meta">' + (c.eu ? 'Country · ' + c.n + (c.n === 1 ? ' region' : ' regions') : 'Not in the EU') + '</p>' +
-      '<p class="tt__title">' + esc(c.name) + '</p><table class="tt__tab"><tbody>' +
-      '<tr><th>Poverty risk</th><td>' + pct(c.cp) + '</td></tr>';
-    if (c.cie != null) html += '<tr><th>Income, EU = 100</th><td>' + f1(c.cie).replace('.0', '') + '</td></tr>';
-    if (c.eu) html += '<tr><th>Turnout 2024</th><td>' + pct(c.ct) + '</td></tr><tr><th>Far right 2024</th><td>' + pct(c.cf) + '</td></tr>';
-    html += '</tbody></table>';
+    // beside each national figure, the lowest and highest of its regions
+    const regs = REGIONS.filter((r) => r.cc === cc), many = c.eu && regs.length > 1;
+    const span = (k, fmt, unit) => {
+      const v = regs.map((r) => r[k]).filter((x) => x != null);
+      return v.length > 1 ? fmt(d3.min(v)) + '–' + fmt(d3.max(v)) + unit : '–';
+    };
+    const whole = (v) => (v == null ? '–' : String(Math.round(v)));
+    const rows = [['Poverty risk', pct(c.cp), span('p', f1, '%')]];
+    if (c.cie != null) rows.push(['Income, EU = 100', whole(c.cie), span('ie', whole, '')]);
+    if (c.eu) rows.push(['Turnout 2024', pct(c.ct), span('t24', f1, '%')], ['Far right 2024', pct(c.cf), span('f24', f1, '%')]);
+    let html = '<p class="tt__meta">' + (c.eu ? 'Country' + (many ? '' : ' · 1 region') : 'Not in the EU') + '</p>' +
+      '<p class="tt__title">' + esc(c.name) + '</p><table class="tt__tab">' +
+      (many ? '<thead><tr><th></th><th>Country</th><th>' + regs.length + ' regions</th></tr></thead>' : '') + '<tbody>' +
+      rows.map((r) => '<tr><th>' + r[0] + '</th><td>' + r[1] + '</td>' + (many ? '<td>' + r[2] + '</td>' : '') + '</tr>').join('') +
+      '</tbody></table>';
     const notes = [];
-    if (c.compulsory) notes.push('Voting is compulsory in ' + c.name + '.');
+    if (c.cc === 'BE' || c.cc === 'IE') notes.push(NOTE[c.cc]);
+    else if (c.compulsory) notes.push('Voting is compulsory in ' + c.name + '.');
     if (!c.eu) notes.push(NOTE.CH);
     if (c.eu && c.cp == null) notes.push('No national poverty figure for the survey year.');
     if (c.eu && c.ct == null) notes.push('National results not available here yet.');
@@ -722,8 +732,8 @@
 
     // countries: squares in the vote colour, labelled where a label fits
     const sq = small ? 9 : 12;
-    svg.append('g').selectAll('rect').data(ctry).join('rect')
-      .attr('class', (c) => 'edv-ctry edv-ctry--' + P.cls + (turnout && c.compulsory ? ' edv-ctry--aside' : ''))
+    const sqClass = (c) => 'edv-ctry edv-ctry--' + P.cls + (turnout && c.compulsory ? ' edv-ctry--aside' : '');
+    svg.append('g').selectAll('rect').data(ctry).join('rect').attr('class', sqClass)
       .attr('width', sq).attr('height', sq).attr('rx', 1.5).attr('x', (c) => x(XC(c)) - sq / 2).attr('y', (c) => y(c[P.ckey]) - sq / 2);
     const taken = ctry.map((c) => ({ x0: x(XC(c)) - sq / 2, x1: x(XC(c)) + sq / 2, y0: y(c[P.ckey]) - sq / 2, y1: y(c[P.ckey]) + sq / 2 }));
     const labels = [];
@@ -736,13 +746,16 @@
         if (b.x0 < m.l || b.x1 > W - m.r || b.y0 < 0 || b.y1 > H - m.b) continue;
         if (taken.some((t) => !(b.x1 < t.x0 || b.x0 > t.x1 || b.y1 < t.y0 || b.y0 > t.y1))) continue;
         taken.push(b);
-        labels.push({ code, x: bx + w / 2, y: by + h - 2 });
+        labels.push({ cc: c.cc, code, x: bx + w / 2, y: by + h - 2 });
         break;
       }
     });
     svg.append('g').selectAll('text').data(labels).join('text').attr('class', 'edv-ctry-label')
       .attr('x', (l) => l.x).attr('y', (l) => l.y).attr('text-anchor', 'middle').text((l) => l.code);
 
+    // hovering a country: its regions and its square are redrawn on top, everything else steps back
+    const front = svg.append('g').attr('class', 'edv-front');
+    const frontDots = front.append('g'), frontSq = front.append('g');
     const ring = svg.append('circle').attr('class', 'focus-ring').attr('r', rr + 3).attr('visibility', 'hidden');
     const ringSq = svg.append('rect').attr('class', 'focus-ring').attr('width', sq + 6).attr('height', sq + 6).attr('visibility', 'hidden');
     const show = (d, isCountry) => {
@@ -756,6 +769,15 @@
       if (r) ring.attr('cx', x(XR(r))).attr('cy', y(r[P.key]));
       ringSq.attr('visibility', c ? 'visible' : 'hidden');
       if (c) ringSq.attr('x', x(XC(c)) - sq / 2 - 3).attr('y', y(c[P.ckey]) - sq / 2 - 3);
+      svg.classed('has-ctry', !!c);
+      frontDots.selectAll('circle').data(c ? regs.filter((d) => d.cc === c.cc) : []).join('circle')
+        .attr('class', 'edv-dot edv-dot--' + P.cls).attr('r', rr + 1).attr('cx', (d) => x(XR(d))).attr('cy', (d) => y(d[P.key]));
+      frontSq.selectAll('rect').data(c ? [c] : []).join('rect').attr('class', sqClass).attr('width', sq).attr('height', sq).attr('rx', 1.5)
+        .attr('x', (d) => x(XC(d)) - sq / 2).attr('y', (d) => y(d[P.ckey]) - sq / 2);
+      const l = c && labels.find((d) => d.cc === c.cc), code = c && (SHOW_CODE[c.cc] || c.cc);
+      const lx = c && (l ? l.x : x(XC(c)) + sq / 2 + 3 + code.length * 3.5 + 1), ly = c && (l ? l.y : y(c[P.ckey]) + 4);
+      frontSq.selectAll('text').data(c ? [code] : []).join('text').attr('class', 'edv-ctry-label').attr('text-anchor', 'middle')
+        .attr('x', lx).attr('y', ly).text((d) => d);
     };
     ALLV = { mark };
     svg.append('rect').attr('class', 'overlay').attr('width', W).attr('height', H).attr('aria-hidden', 'true')
