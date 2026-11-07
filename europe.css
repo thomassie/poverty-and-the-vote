@@ -216,6 +216,8 @@
   padding-block: clamp(2.5rem, 6vw, 4.5rem);
   border-bottom: 1px solid var(--rule);
 }
+.edv .hero__switch { grid-column: 1 / -1; display: grid; gap: 0.4rem; min-width: 0; }
+.edv .hero__pov { font-family: var(--font-support); font-size: 0.8125rem; color: var(--muted); }
 .edv .hero__item { display: grid; gap: 0.6rem; align-content: start; min-width: 0; }
 .edv .hero__label { font-family: var(--font-support); font-size: 0.875rem; color: var(--muted); display: inline-flex; align-items: center; gap: 0.5rem; }
 .edv .hero__figure { font-family: var(--font-body); font-weight: 500; font-size: clamp(3.25rem, 10vw, 6.5rem); line-height: 0.9; letter-spacing: -0.03em; }
