@@ -288,9 +288,9 @@
     return () => { last = -1; run(); };
   }
 
-  function tooltip(container) {
+  function tooltip(container, cls) {
     const tip = document.createElement('div');
-    tip.className = 'tooltip';
+    tip.className = 'tooltip' + (cls ? ' ' + cls : '');
     tip.hidden = true;
     tip.setAttribute('role', 'status');
     container.appendChild(tip);
@@ -561,7 +561,7 @@
     const W = Math.round(el.clientWidth);
     if (!W || !MAP) return;
     el.querySelectorAll('svg, .edv-insets, p.note').forEach((x) => x.remove());
-    const tip = el._tip || (el._tip = tooltip(el));
+    const tip = el._tip || (el._tip = tooltip(el, 'tooltip--see'));
     tip.hide();
     const proj = d3.geoIdentity().reflectY(true).fitWidth(W, EXTENT);
     const path = d3.geoPath(proj);
