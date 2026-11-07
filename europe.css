@@ -124,7 +124,7 @@
   line-height: 1.4;
 }
 .edv .tooltip[hidden] { display: none; }
-/* on the map only: see-through, so the regions under it stay visible */
+/* in "All countries together" only: see-through, so the regions under it stay visible */
 .edv .tooltip--see { background: color-mix(in srgb, var(--paper) 72%, transparent); box-shadow: 0 4px 16px rgb(0 0 0 / 0.06); }
 @media (prefers-reduced-transparency: reduce) { .edv .tooltip--see { background: var(--paper); box-shadow: 0 6px 24px rgb(0 0 0 / 0.12); } }
 .edv .tt__meta { font-family: var(--font-support); font-size: 0.75rem; color: var(--muted); }

@@ -561,7 +561,7 @@
     const W = Math.round(el.clientWidth);
     if (!W || !MAP) return;
     el.querySelectorAll('svg, .edv-insets, p.note').forEach((x) => x.remove());
-    const tip = el._tip || (el._tip = tooltip(el, 'tooltip--see'));
+    const tip = el._tip || (el._tip = tooltip(el));
     tip.hide();
     const proj = d3.geoIdentity().reflectY(true).fitWidth(W, EXTENT);
     const path = d3.geoPath(proj);
@@ -692,7 +692,7 @@
     const W = Math.round(el.clientWidth);
     if (!W) return;
     el.querySelectorAll('svg').forEach((n) => n.remove());
-    const tip = el._tip || (el._tip = tooltip(el));
+    const tip = el._tip || (el._tip = tooltip(el, 'tooltip--see'));
     tip.hide();
     const P = PMEASURES[state.am], small = W < 520, turnout = P.key === 't24';
     const A = ALLX[state.pov], XR = A.region, XC = A.country;
