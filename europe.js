@@ -51,7 +51,7 @@
 
   <section class="block wrap" aria-labelledby="edv-h-map">
     <div class="block__rail">
-      <h2 id="edv-h-map">Region by region</h2>
+      <h2 id="edv-h-map">Region by region<svg class="title-dot" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><circle cx="5" cy="5" r="5"/></svg></h2>
       <p id="edv-map-intro">The regions of the 27 member states.</p>
       <p>Poverty risk is the share of people at risk of poverty or social exclusion: with an income below 60% of their country&rsquo;s median, unable to afford basic things, or in a household where hardly anyone works. <a href="#edv-glossary">What the terms mean</a>.</p>
     </div>
@@ -81,7 +81,7 @@
 
   <section class="block wrap" aria-labelledby="edv-h-all">
     <div class="block__rail">
-      <h2 id="edv-h-all">All countries together</h2>
+      <h2 id="edv-h-all">All countries together<svg class="title-dot" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><circle cx="5" cy="5" r="5"/></svg></h2>
       <p>Every member state in one picture, its regions faint behind it. Each square is a country as a whole, and the line is the trend across countries (least squares).</p>
       <p>Between countries more than poverty differs: turnout habits, electoral rules and party landscapes too. With household income, the axis is income in purchasing power, EU&nbsp;=&nbsp;100, so that countries can be compared. The next section compares regions within each country instead.</p>
     </div>
@@ -95,7 +95,7 @@
 
   <section class="block wrap" aria-labelledby="edv-h-countries">
     <div class="block__rail">
-      <h2 id="edv-h-countries">Country by country</h2>
+      <h2 id="edv-h-countries">Country by country<svg class="title-dot" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><circle cx="5" cy="5" r="5"/></svg></h2>
       <p>Turnout and the far right&rsquo;s strength differ far more between countries than inside them: compulsory voting, national elections held the same day, each country&rsquo;s own parties. So each region is compared with the other regions of its own country.</p>
       <p>The two change views ask the same question of how turnout and the far right&rsquo;s share moved between the European elections of 2019 and 2024, in percentage points: did poorer regions fall further behind, or catch up?</p>
       <p>Hollow dots are shown but not counted. France&rsquo;s overseas regions, in the Caribbean, South America and the Indian Ocean, differ from mainland France in too many other ways. In Belgium the lists counted as far right stand only in the Dutch-speaking electoral college, so for the far right only the five Flemish provinces are compared.</p>
@@ -111,7 +111,7 @@
 
   <section class="block wrap" aria-labelledby="edv-h-far">
     <div class="block__rail">
-      <h2 id="edv-h-far">What counts as far right</h2>
+      <h2 id="edv-h-far">What counts as far right<svg class="title-dot" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><circle cx="5" cy="5" r="5"/></svg></h2>
       <p>We follow the PopuList, a classification of European parties by a team of political scientists, as it stands, without changes of our own. It counts a party as far right when it is nativist (the state should belong to the native group) and authoritarian (a strictly ordered society).</p>
       <p>A list counts when the PopuList has its party as far right in the year of the election; a joint list counts by its first-named party. Some of these choices are open to debate, so here is every list counted, with its share of the vote.</p>
     </div>
