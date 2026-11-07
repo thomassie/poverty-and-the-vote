@@ -180,6 +180,9 @@
     p: { key: 'p', ckey: 'cp', short: 'Poverty risk', title: 'At risk of poverty or social exclusion, % of people', cls: 'ink', bins: [12, 16, 20, 25, 30, 40] },
     t: { key: 't24', ckey: 'ct', short: 'Turnout 2024', title: 'Turnout, European election 2024, % of registered voters', cls: 'blue', bins: [30, 40, 50, 60, 70] },
     f: { key: 'f24', ckey: 'cf', short: 'Far right 2024', title: 'Far right, European election 2024, % of valid votes', cls: 'red', bins: [5, 10, 20, 30, 40, 50] },
+    // relative to each country, so regions only; darker = poorer, as on the poverty map (title gets the year at load)
+    i: { key: 'ii', ckey: null, short: 'Income', title: 'Household income relative to the country, country = 100 (darker: poorer)', cls: 'ink',
+      bins: [80, 90, 100, 110, 125], reverse: true, regionsOnly: true },
   };
   // small multiples: the vote measure against poverty risk; dir = the direction the question asks about
   const PMEASURES = {
@@ -436,7 +439,7 @@
   // ---------- map ----------
   const nBins = (M) => M.bins.length + 1;
   const binOf = (v, M) => d3.bisectRight(M.bins, v);
-  const opOf = (i, M) => +(0.16 + (0.84 * i) / (nBins(M) - 1)).toFixed(3);
+  const opOf = (i, M) => +(0.16 + (0.84 * (M.reverse ? nBins(M) - 1 - i : i)) / (nBins(M) - 1)).toFixed(3);
 
   function drawLegend() {
     const M = MEASURES[state.measure], el = $('#legend'), n = nBins(M);
@@ -552,7 +555,7 @@
     const proj = d3.geoIdentity().reflectY(true).fitWidth(W, EXTENT);
     const path = d3.geoPath(proj);
     const H = Math.round(path.bounds(EXTENT)[1][1]);
-    const M = MEASURES[state.measure], level = state.level;
+    const M = MEASURES[state.measure], level = M.regionsOnly ? 'r' : state.level;
     const svg = d3.select(el).insert('svg', ':first-child')
       .attr('width', W).attr('height', H).attr('viewBox', '0 0 ' + W + ' ' + H)
       .attr('class', W < 600 ? 'edv-mapsvg edv-mapsvg--small' : 'edv-mapsvg')
@@ -931,7 +934,7 @@
       $('#map-intro').textContent = 'The ' + eu.length + ' regions of the 27 member states, with Switzerland for poverty risk. ' +
         'Regions are the EU’s statistical regions (NUTS 2): in Germany the Regierungsbezirke, or the whole Land where there are none; ' +
         'in Italy the regioni; in France the former régions. ' +
-        'Switch between poverty risk, turnout and the far right’s share of the vote in June 2024.';
+        'Switch between poverty risk, household income, turnout and the far right’s share of the vote in June 2024.';
       if (sum) {
         $('#eu').innerHTML = 'Across the EU: turnout <strong>' + pct(sum.eu_turnout_2024) + '</strong> in 2024 (' + pct(sum.eu_turnout_2019) +
           ' in 2019); far right <strong>' + pct(sum.eu_far_right_2024) + '</strong> of valid votes (' + pct(sum.eu_far_right_2019) + ').';
@@ -940,8 +943,12 @@
       }
 
       const mapEl = $('#map');
-      const redrawMap = () => { drawLegend(); drawMap(mapEl); };
-      buildSeg($('#measure'), [['p', 'Poverty risk'], ['t', 'Turnout'], ['f', 'Far right']], 'measure', redrawMap);
+      const incYear = (regions.find((r) => r.iy) || {}).iy;
+      if (incYear) MEASURES.i.title = 'Household income ' + incYear + ' relative to the country, country = 100 (darker: poorer)';
+      const levelSeg = () => { $('#level').hidden = !!MEASURES[state.measure].regionsOnly; };
+      const redrawMap = () => { levelSeg(); drawLegend(); drawMap(mapEl); };
+      buildSeg($('#measure'), [['p', 'Poverty risk'], ['i', 'Income'], ['t', 'Turnout'], ['f', 'Far right']], 'measure', redrawMap);
+      levelSeg();
       buildSeg($('#level'), [['r', 'Regions'], ['c', 'Countries']], 'level', () => { state.pinned = null; state.focus = null; focus(null); drawMap(mapEl); });
       drawLegend();
       onWidth(mapEl, () => drawMap(mapEl));
