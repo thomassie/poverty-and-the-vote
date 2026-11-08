@@ -180,10 +180,14 @@
     p: { key: 'p', ckey: 'cp', short: 'Poverty risk', title: 'At risk of poverty or social exclusion, % of people', cls: 'ink', bins: [12, 16, 20, 25, 30, 40] },
     t: { key: 't24', ckey: 'ct', short: 'Turnout 2024', title: 'Turnout, European election 2024, % of registered voters', cls: 'blue', bins: [30, 40, 50, 60, 70] },
     f: { key: 'f24', ckey: 'cf', short: 'Far right 2024', title: 'Far right, European election 2024, % of valid votes', cls: 'red', bins: [5, 10, 20, 30, 40, 50] },
-    // relative to each country, so regions only; darker = poorer, as on the poverty map (title gets the year at load)
-    i: { key: 'ii', ckey: null, short: 'Income', title: 'Household income relative to the country, country = 100 (darker: poorer)', cls: 'ink',
-      bins: [80, 90, 100, 110, 125], reverse: true, regionsOnly: true },
+    // regions: relative to their own country (country = 100); countries: in purchasing power, EU = 100.
+    // darker = poorer, as on the poverty map (titles get the year at load)
+    i: { key: 'ii', ckey: 'cie', short: 'Income', title: 'Household income relative to the country, country = 100 (darker: poorer)', cls: 'ink',
+      bins: [80, 90, 100, 110, 125], reverse: true,
+      country: { title: 'Household income per inhabitant in purchasing power, EU = 100 (darker: poorer)', bins: [70, 80, 90, 100, 110, 125] } },
   };
+  // the map's measure at the current level (income has its own title and steps for whole countries)
+  const mapMeasure = () => { const M = MEASURES[state.measure]; return state.level === 'c' && M.country ? { ...M, ...M.country } : M; };
   // small multiples: the vote measure against poverty risk; dir = the direction the question asks about
   const PMEASURES = {
     t: { key: 't24', ckey: 'ct', noun: 'turnout', short: 'Turnout', cls: 'blue', ymax: 90, ticks: [0, 30, 60, 90], dir: -1,
@@ -442,7 +446,7 @@
   const opOf = (i, M) => +(0.16 + (0.84 * (M.reverse ? nBins(M) - 1 - i : i)) / (nBins(M) - 1)).toFixed(3);
 
   function drawLegend() {
-    const M = MEASURES[state.measure], el = $('#legend'), n = nBins(M);
+    const M = mapMeasure(), el = $('#legend'), n = nBins(M);
     const W = Math.max(220, Math.min(el.clientWidth || 360, 420)), bw = (W - 2) / n, h = 12;
     let svg = '<svg width="' + W + '" height="' + (h + 18) + '" viewBox="0 0 ' + W + ' ' + (h + 18) + '" aria-hidden="true">';
     for (let i = 0; i < n; i++) {
@@ -463,7 +467,7 @@
     return d ? { d, v: d[level === 'c' ? M.ckey : M.key] } : null;
   }
   function shade(sel, level) {
-    const M = MEASURES[state.measure];
+    const M = mapMeasure();
     sel.attr('class', (f) => {
       const o = valueOf(f, M, level);
       if (!o) return 'edv-rg edv-rg--out';
@@ -566,13 +570,13 @@
     const proj = d3.geoIdentity().reflectY(true).fitWidth(W, EXTENT);
     const path = d3.geoPath(proj);
     const H = Math.round(path.bounds(EXTENT)[1][1]);
-    const M = MEASURES[state.measure], level = M.regionsOnly ? 'r' : state.level;
+    const M = mapMeasure(), level = state.level;
     const svg = d3.select(el).insert('svg', ':first-child')
       .attr('width', W).attr('height', H).attr('viewBox', '0 0 ' + W + ' ' + H)
       .attr('class', W < 600 ? 'edv-mapsvg edv-mapsvg--small' : 'edv-mapsvg')
       .attr('role', 'img')
       .attr('aria-label', (level === 'c' ? 'Map of the EU member states' : 'Map of ' + MAP.dataCount + ' European regions') +
-        ', shaded by ' + M.title.toLowerCase() + '. Darker means more. Use the search box above or the table below to read one region.');
+        ', shaded by ' + M.title.replace(/ \(darker: poorer\)$/, '').toLowerCase() + (M.reverse ? '. Darker means poorer.' : '. Darker means more.') + ' Use the search box above or the table below to read one region.');
     svg.append('clipPath').attr('id', 'edv-clip').append('rect').attr('width', W).attr('height', H);
     const g = svg.append('g').attr('clip-path', 'url(#edv-clip)');
     const regs = g.append('g').selectAll('path').data(level === 'c' ? MAP.countryFeats : MAP.main).join('path').attr('d', path);
@@ -974,12 +978,13 @@
 
       const mapEl = $('#map');
       const incYear = (regions.find((r) => r.iy) || {}).iy;
-      if (incYear) MEASURES.i.title = 'Household income ' + incYear + ' relative to the country, country = 100 (darker: poorer)';
-      const levelSeg = () => { $('#level').hidden = !!MEASURES[state.measure].regionsOnly; };
-      const redrawMap = () => { levelSeg(); drawLegend(); drawMap(mapEl); };
+      if (incYear) {
+        MEASURES.i.title = 'Household income ' + incYear + ' relative to the country, country = 100 (darker: poorer)';
+        MEASURES.i.country.title = 'Household income ' + incYear + ' per inhabitant in purchasing power, EU = 100 (darker: poorer)';
+      }
+      const redrawMap = () => { drawLegend(); drawMap(mapEl); };
       buildSeg($('#measure'), [['p', 'Poverty risk'], ['i', 'Income'], ['t', 'Turnout'], ['f', 'Far right']], 'measure', redrawMap);
-      levelSeg();
-      buildSeg($('#level'), [['r', 'Regions'], ['c', 'Countries']], 'level', () => { state.pinned = null; state.focus = null; focus(null); drawMap(mapEl); });
+      buildSeg($('#level'), [['r', 'Regions'], ['c', 'Countries']], 'level', () => { state.pinned = null; state.focus = null; focus(null); drawLegend(); drawMap(mapEl); });
       drawLegend();
       onWidth(mapEl, () => drawMap(mapEl));
       onWidth($('#legend'), drawLegend);
