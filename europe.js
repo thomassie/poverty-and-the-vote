@@ -59,8 +59,8 @@
       <div class="seg" role="group" aria-label="Measure shown on the map" id="edv-measure"></div>
       <div class="seg" role="group" aria-label="Map level" id="edv-level"></div>
       <div class="edv-tools">
-        <label class="edv-find" for="edv-find">Find a region</label>
-        <input type="search" id="edv-find" list="edv-find-list" placeholder="e.g. Sicilia" autocomplete="off" spellcheck="false">
+        <label class="edv-find" for="edv-find"><svg class="edv-mag" viewBox="0 0 16 16" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.75"/><line x1="10" y1="10" x2="14.5" y2="14.5"/></svg><span>Find a region</span>
+          <input type="search" id="edv-find" list="edv-find-list" placeholder="e.g. Sicilia" autocomplete="off" spellcheck="false"></label>
         <datalist id="edv-find-list"></datalist>
       </div>
       <div class="edv-legend" id="edv-legend"></div>
