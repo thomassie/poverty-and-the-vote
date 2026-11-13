@@ -28,7 +28,6 @@
     <h1>Poverty and the Vote<svg class="title-dot" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><circle cx="5" cy="5" r="5"/></svg></h1>
     <p class="lede">Do people in poorer regions vote less, and do they vote more for the far right? The European Parliament election of June 2024, region by region, set against the share of people at risk of poverty.</p>
   </div>
-  <div class="mark" aria-hidden="true"><span class="mark__square"></span><span class="mark__circle"></span><span class="mark__half"></span></div>
 </div>
 
 <div class="edv__main">
@@ -171,8 +170,8 @@
     <p class="credit">Election results: F.&nbsp;Hublet (2024), <a href="https://doi.org/10.5281/zenodo.14569325">BLUE_EP: municipality-level results of European Parliament elections</a>, Groupe d&rsquo;&eacute;tudes g&eacute;opolitiques (CC BY 4.0). Far right: <a href="https://popu-list.org">The PopuList</a> 4.0, M.&nbsp;Rooduijn, A.&nbsp;L.&nbsp;P.&nbsp;Pirro, D.&nbsp;Halikiopoulou, C.&nbsp;Froio, S.&nbsp;van Kessel, S.&nbsp;L.&nbsp;de Lange, C.&nbsp;Mudde and P.&nbsp;Taggart; see <a href="https://doi.org/10.1017/S0007123423000431">British Journal of Political Science 54(3), 2024</a>. Poverty risk: Eurostat, ilc_peps11n. Household income: Eurostat, nama_10r_2hhinc. Municipalities to regions: Eurostat, LAU 2024. Boundaries: &copy; EuroGeographics (GISCO, NUTS 2024). <span id="edv-freshness"></span></p>
   </div>
 </section>`;
-  // data-header="false": the host page shows its own title, so drop ours (title, label, mark) but keep the intro question
-  if (root.dataset.header === 'false') root.querySelectorAll('.masthead h1, .masthead .eyebrow, .masthead .mark').forEach((n) => n.remove());
+  // data-header="false": the host page shows its own label, title and description, so drop the whole masthead
+  if (root.dataset.header === 'false') root.querySelector('.masthead').remove();
 
   // ---------- settings ----------
   // map shading: fixed steps, shared by all regions; opacity steps of one colour per measure

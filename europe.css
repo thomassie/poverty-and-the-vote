@@ -75,12 +75,6 @@
 .edv .masthead__text { display: grid; gap: 1.25rem; max-width: 46rem; min-width: 0; }
 .edv .masthead h1 { font-size: var(--step-3); letter-spacing: -0.02em; }
 .edv .lede { font-size: var(--step-1); line-height: 1.45; max-width: 38rem; }
-/* Bauhaus mark: people (circle), parliament (square), the vote (half circle). */
-.edv .mark { position: relative; width: 168px; height: 168px; flex: none; }
-.edv .mark span { position: absolute; display: block; }
-.edv .mark__square { left: 0; bottom: 0; width: 104px; height: 104px; background: var(--blue); border-radius: 10px; }
-.edv .mark__circle { right: 0; top: 0; width: 104px; height: 104px; background: var(--red); border-radius: 50%; }
-.edv .mark__half { right: 8px; bottom: 0; width: 72px; height: 36px; background: var(--yellow); border-radius: 72px 72px 0 0; }
 
 /* ---------- Sections ---------- */
 .edv .block {
@@ -206,10 +200,6 @@
 .edv .edv-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 .edv .edv-hatch-bg { fill: var(--paper); }
 .edv .edv-hatch-line { stroke: var(--muted); stroke-width: 1.2px; stroke-opacity: 0.6; }
-/* Mark: poverty (square, ink), turnout (circle, blue), far right (half circle, red) */
-.edv .mark__square { background: var(--ink); }
-.edv .mark__circle { background: var(--blue); }
-.edv .mark__half { background: var(--red); }
 /* Hero: two figures side by side */
 .edv .hero {
   display: grid;
@@ -377,10 +367,6 @@
 .edv .edv-list td, .edv .tt__title, .edv .edv-panel__name { overflow-wrap: anywhere; }
 @container edv (max-width: 760px) {
   .edv .masthead { grid-template-columns: minmax(0, 1fr); }
-  .edv .mark { width: 96px; height: 96px; order: -1; }
-  .edv .mark__square { width: 60px; height: 60px; border-radius: 7px; }
-  .edv .mark__circle { width: 60px; height: 60px; }
-  .edv .mark__half { width: 42px; height: 21px; right: 4px; }
   .edv .block, .edv .foot { grid-template-columns: minmax(0, 1fr); }
   .edv .seg button { padding: 0 0.6rem; }
 }
