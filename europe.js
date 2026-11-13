@@ -180,10 +180,10 @@
     t: { key: 't24', ckey: 'ct', short: 'Turnout 2024', title: 'Turnout, European election 2024, % of registered voters', cls: 'blue', bins: [30, 40, 50, 60, 70] },
     f: { key: 'f24', ckey: 'cf', short: 'Far right 2024', title: 'Far right, European election 2024, % of valid votes', cls: 'red', bins: [5, 10, 20, 30, 40, 50] },
     // regions: relative to their own country (country = 100); countries: in purchasing power, EU = 100.
-    // darker = poorer, as on the poverty map (titles get the year at load)
-    i: { key: 'ii', ckey: 'cie', short: 'Income', title: 'Household income relative to the country, country = 100 (darker: poorer)', cls: 'ink',
+    // a stronger shade = poorer, as on the poverty map (titles get the year at load); "stronger", not "darker": in the dark theme the shade grows lighter
+    i: { key: 'ii', ckey: 'cie', short: 'Income', title: 'Household income relative to the country, country = 100 (stronger shade: poorer)', cls: 'ink',
       bins: [80, 90, 100, 110, 125], reverse: true,
-      country: { title: 'Household income per inhabitant in purchasing power, EU = 100 (darker: poorer)', bins: [70, 80, 90, 100, 110, 125] } },
+      country: { title: 'Household income per inhabitant in purchasing power, EU = 100 (stronger shade: poorer)', bins: [70, 80, 90, 100, 110, 125] } },
   };
   // the map's measure at the current level (income has its own title and steps for whole countries)
   const mapMeasure = () => { const M = MEASURES[state.measure]; return state.level === 'c' && M.country ? { ...M, ...M.country } : M; };
@@ -575,7 +575,7 @@
       .attr('class', W < 600 ? 'edv-mapsvg edv-mapsvg--small' : 'edv-mapsvg')
       .attr('role', 'img')
       .attr('aria-label', (level === 'c' ? 'Map of the EU member states' : 'Map of ' + MAP.dataCount + ' European regions') +
-        ', shaded by ' + M.title.replace(/ \(darker: poorer\)$/, '').toLowerCase() + (M.reverse ? '. Darker means poorer.' : '. Darker means more.') + ' Use the search box above or the table below to read one region.');
+        ', shaded by ' + M.title.replace(/ \(stronger shade: poorer\)$/, '').toLowerCase() + (M.reverse ? '. A stronger shade means poorer.' : '. A stronger shade means more.') + ' Use the search box above or the table below to read one region.');
     svg.append('clipPath').attr('id', 'edv-clip').append('rect').attr('width', W).attr('height', H);
     const g = svg.append('g').attr('clip-path', 'url(#edv-clip)');
     const regs = g.append('g').selectAll('path').data(level === 'c' ? MAP.countryFeats : MAP.main).join('path').attr('d', path);
@@ -978,8 +978,8 @@
       const mapEl = $('#map');
       const incYear = (regions.find((r) => r.iy) || {}).iy;
       if (incYear) {
-        MEASURES.i.title = 'Household income ' + incYear + ' relative to the country, country = 100 (darker: poorer)';
-        MEASURES.i.country.title = 'Household income ' + incYear + ' per inhabitant in purchasing power, EU = 100 (darker: poorer)';
+        MEASURES.i.title = 'Household income ' + incYear + ' relative to the country, country = 100 (stronger shade: poorer)';
+        MEASURES.i.country.title = 'Household income ' + incYear + ' per inhabitant in purchasing power, EU = 100 (stronger shade: poorer)';
       }
       const redrawMap = () => { drawLegend(); drawMap(mapEl); };
       buildSeg($('#measure'), [['p', 'Poverty risk'], ['i', 'Income'], ['t', 'Turnout'], ['f', 'Far right']], 'measure', redrawMap);
